@@ -1,0 +1,26 @@
+{
+  "name": "shardeum-status-server",
+  "version": "1.0.0",
+  "description": "Shardeum Status Server to monitor the health of Shardeum systems",
+  "main": "app.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx tsc && nodemon build/app.js"
+  },
+  "author": "Ekene Eze",
+  "license": "ISC",
+  "dependencies": {
+    "@types/response-time": "^2.3.8",
+    "axios": "^1.6.7",
+    "cors": "^2.8.5",
+    "express": "^4.18.3",
+    "https": "^1.0.0",
+    "nodemon": "^3.1.0",
+    "prom-client": "^15.1.0",
+    "response-time": "^2.3.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "typescript": "^5.4.2"
+  }
+}

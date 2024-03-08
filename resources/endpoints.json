@@ -1,0 +1,56 @@
+{
+    "urls": [
+        {
+            "group": "Archivers Servers",
+            "servers": [
+                {
+                    "url": "http://172.105.153.160:4000/nodelist",
+                    "name": "Archivers-1",
+                    "help": "This is the first Archiver server"
+                },
+                {
+                    "url": "http://172.105.153.160:4000/nodelist",
+                    "name": "Archivers-2",
+                    "help": "This is the second Archiver server"
+                }
+            ]
+        },
+        {
+            "group": "Monitors Servers",
+            "servers": [
+                {
+                    "url": "http://50.116.18.184:3000/summary",
+                    "name": "Monitor-1",
+                    "help": "This is the first Monitor server"
+                }
+            ]
+        },
+        {
+            "url": "http://72.14.184.233:8080/",
+            "name": "JSON-RPC",
+            "help": "This is the first JSON-RPC server",
+            "body": {
+                "jsonrpc": "2.0",
+                "method": "eth_gasPrice",
+                "params": [],
+                "id": 73
+            }
+        }, 
+        {
+            "url": "https://explorer-sphinx.shardeum.org/",
+            "name": "Explorer",
+            "help": "This is the Shardeum Explorer"
+
+        },
+        {
+            "url": "https://shardeum.org/",
+            "name": "Website",
+            "help": "This is the Shardeum Website"
+        },
+        {
+            "url": "https://docs.shardeum.org/",
+            "name": "Documentation",
+            "help": "This is the Shardeum Documentation"
+        }
+    ]
+}
