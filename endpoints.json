@@ -5,12 +5,12 @@
             "servers": [
                 {
                     "url": "http://172.105.153.160:4000/nodelist",
-                    "name": "Archivers-1",
+                    "name": "Archiver 1",
                     "help": "This is the first Archiver server"
                 },
                 {
-                    "url": "http://172.105.153.160:4000/nodelist",
-                    "name": "Archivers-2",
+                    "url": "http://172.105.153.160:4000/nodelistfaddada",
+                    "name": "Archiver 2",
                     "help": "This is the second Archiver server"
                 }
             ]
@@ -20,14 +20,14 @@
             "servers": [
                 {
                     "url": "http://50.116.18.184:3000/summary",
-                    "name": "Monitor-1",
+                    "name": "Monitor 1",
                     "help": "This is the first Monitor server"
                 }
             ]
         },
         {
-            "url": "http://72.14.184.233:8080/",
-            "name": "JSON-RPC",
+            "url": "http://72.14.184.233:8080",
+            "name": "JSON-RPC Server",
             "help": "This is the first JSON-RPC server",
             "body": {
                 "jsonrpc": "2.0",

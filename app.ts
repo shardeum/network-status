@@ -2,35 +2,25 @@ import { Request, Response } from 'express';
 const express = require('express');
 const cors = require('cors')
 const prometheus = require('prom-client');
-const Health = require('./services/health');
+const HealthChecker = require('./services/servicecheck');
 const app = express();
+require('dotenv').config();
 
 app.use(cors());
+const healthChecker = new HealthChecker();
 
-const collectDefaultMetrics = prometheus.collectDefaultMetrics;
-collectDefaultMetrics();
+const PORT = process.env.PORT || 3002;
 
 app.get('/metrics', async (req: Request, res: Response) => {
-  console.log('GET /metrics');
-  try {
-    const metrics = await prometheus.register.metrics();
-    res.set('Content-Type', prometheus.register.contentType);
-    res.send(metrics);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' })
-  }
+  // healthChecker.runChecksWithTimeout();
+  healthChecker.getServerHealth();
+  console.log(healthChecker.getServerHealth());
+  const metrics = await prometheus.register.metrics();
+  res.set('Content-Type', prometheus.register.contentType);
+  res.send(metrics);
 });
 
-
-Health.check();
-
-interface Service {
-  name: string;
-  status: number;
-}
-
-
-app.listen(3002, () => {
-  console.log('Server started on http://localhost:3002');
+app.listen(PORT, () => {
+  console.log('Server started on PORT ' + PORT);
 });
 
