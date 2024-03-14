@@ -1,5 +1,11 @@
+
 const prometheus = require('prom-client');
 const axios = require('axios');
+
+interface Group {
+    group: string;
+    servers: Endpoint[];
+}
 
 interface Endpoint {
     url: string;
@@ -16,12 +22,13 @@ interface Group {
     group: string;
     servers: Endpoint[];
 }
+
 class HealthChecker {
     static instance: HealthChecker;
     endpoints: (Group | Endpoint)[] = [];
     serverHealth: any;
-    isChecking: boolean = false;
     serviceHealthGauge: any;
+    checkingStatus = new Map();
 
     constructor() {
         if (HealthChecker.instance) {
@@ -29,83 +36,63 @@ class HealthChecker {
         }
         const loadedEndpoints = require('../../endpoints.json');
         this.endpoints = this.flattenEndpoints(loadedEndpoints.urls);
-        this.isChecking = false;
-        this.startPeriodicChecks();
-        // Initialize Prometheus metrics
         this.serviceHealthGauge = new prometheus.Gauge({
             name: 'Shardeum',
             help: 'Current health status of services (1 = online, 0 = offline)',
             labelNames: ['name', 'duration', 'last_checked'],
         });
+        HealthChecker.instance = this;
+        this.startPeriodicChecks();
     }
 
     flattenEndpoints(urls: any[]) {
         return urls.flatMap(endpoint => 'servers' in endpoint ? endpoint.servers : [endpoint]);
     }
-    // Perform service checks
-    async checkService(service: any) {
+
+    async checkService(service: Endpoint) {
+        this.checkingStatus.set(service.name, true);
+
         const startTime = new Date().getTime();
-        const { url, body, name } = service;
-        console.log('Checking service:', name, url, body);
         try {
-            const response = body ? await axios.post(url, body) : await axios.get(url);
+            const response = service.body ? await axios.post(service.url, service.body) : await axios.get(service.url);
             const durationInSeconds = (Date.now() - startTime) / 1000;
-            this.serviceHealthGauge.labels(name, durationInSeconds, Date.now()).set(1);
-            return { name, status: 'online', lastChecked: new Date() };
+            this.serviceHealthGauge.labels(service.name, durationInSeconds, Date.now()).set(1);
+            this.checkingStatus.set(service.name, false);
 
-        } catch (error: any) {
-            console.log('Error checking service:' + name, error.code);
+            return { name: service.name, status: 'online', lastChecked: new Date() };
+        } catch (error) {
             const durationInSeconds = (Date.now() - startTime) / 1000;
-            this.serviceHealthGauge.labels(name, durationInSeconds, Date.now()).set(0);
-            return { name, status: 'offline', lastChecked: new Date(), error };
+            this.serviceHealthGauge.labels(service.name, durationInSeconds, Date.now()).set(0);
+            this.checkingStatus.set(service.name, false);
+            return { name: service.name, status: 'offline', lastChecked: new Date(), error: error };
         }
     }
 
-    // Run checks with timeout
+    async checkServiceWithTimeout(service: Endpoint, timeout = 120000) { // Any ongoing service check should not take longer than 2 minutes
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Service check timed out')), timeout)
+        );
+        try {
+            await Promise.race([this.checkService(service), timeoutPromise]);
+        } catch (error) {
+            console.error(`Error or timeout checking service: ${service.name}`, error);
+        } finally {
+            this.checkingStatus.set(service.name, false);
+        }
+    }
+
     async runChecksWithTimeout() {
-        if (!this.isChecking) {
-            this.isChecking = true;
-            const timeoutId = setTimeout(() => {
-                console.error('Service checks timed out!');
-                this.isChecking = false;
-            }, 30000); // Any ongoing checks should not take longer than 30 seconds
-
-            const promises = this.endpoints.map(service => this.checkService(service));
-            try {
-                const results = await Promise.all(promises);
-                this.updateServerHealth(results);
-            } catch (error) {
-                console.error('Error during checks:', error);
-            } finally {
-                this.isChecking = false;
-                clearTimeout(timeoutId);
+        this.endpoints.forEach((service: any) => {
+            if (!this.checkingStatus.get(service.name)) {
+                this.checkServiceWithTimeout(service);
             }
-        }
+        });
     }
 
-    // Update server health based on check results
-    updateServerHealth(results: any[]) {
-        this.serverHealth = results;
-        console.log('Server health updated:', this.serverHealth);
-    }
-
-    getServerHealth() {
-        if (!this.serverHealth) {
-            return 'Health checks in progress';
-        }
-        return this.serverHealth;
-    }
-
-    // Start periodic health checks
     startPeriodicChecks() {
         this.runChecksWithTimeout();
-        setInterval(() => {
-            if (!this.isChecking) {
-                this.runChecksWithTimeout();
-            }
-        }, 50000); // Run checks every 50 seconds
+        setInterval(() => this.runChecksWithTimeout(), 60000); // Run checks every minute
     }
-
 }
 
 module.exports = HealthChecker;
