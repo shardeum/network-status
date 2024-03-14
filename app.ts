@@ -12,6 +12,7 @@ const healthChecker = new HealthChecker();
 const PORT = process.env.PORT || 3002;
 
 app.get('/metrics', async (req: Request, res: Response) => {
+  healthChecker.startPeriodicChecks();
   const metrics = await prometheus.register.metrics();
   res.set('Content-Type', prometheus.register.contentType);
   res.send(metrics);

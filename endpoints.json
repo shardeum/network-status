@@ -19,7 +19,7 @@
             "group": "Monitors Servers",
             "servers": [
                 {
-                    "url": "http://50.116.18.184:3000/summary",
+                    "url": "http://50.116.18.184:3000/summarasdsfy",
                     "name": "Monitor 1",
                     "help": "This is the first Monitor server"
                 }
