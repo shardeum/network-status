@@ -39,7 +39,7 @@ class HealthChecker {
         this.serviceHealthGauge = new prometheus.Gauge({
             name: 'Shardeum',
             help: 'Current health status of services (1 = online, 0 = offline)',
-            labelNames: ['name', 'duration', 'last_checked'],
+            labelNames: ['name', 'duration', 'timestamp'],
         });
         HealthChecker.instance = this;
         this.startPeriodicChecks();
