@@ -34,8 +34,7 @@
                 {
                     "url": "http://50.116.18.184:3000/summary",
                     "name": "Monitor 1",
-                    "help": "This is the first Monitor server",
-                    "expectedResponse": "Ascending"
+                    "help": "This is the first Monitor server"
                 }
             ]
         },
@@ -48,30 +47,23 @@
                 "method": "eth_gasPrice",
                 "params": [],
                 "id": 73
-            },
-            "expectedResponse": {
-                    "jsonrpc": "2.0",
-                    "id": 73
             }
         }, 
         {
             "url": "https://explorer-sphinx.shardeum.orgdfsgs/",
             "name": "Explorer",
-            "help": "This is the Shardeum Explorer",
-            "expectedResponse": "The Shardeum Betanet Explorer"
+            "help": "This is the Shardeum Explorer"
 
         },
         {
             "url": "https://shardeum.org",
             "name": "Website",
-            "help": "This is the Shardeum Website",
-            "expectedResponse": "Shardeum | EVM based Sharded Layer 1 Blockchain"
+            "help": "This is the Shardeum Website"
         },
         {
             "url": "https://docs.shardeum.org/",
             "name": "Documentation",
-            "help": "This is the Shardeum Documentation",
-            "expectedResponse": "Shardeum is a dynamic state sharded EVM-based L1 with low transaction fees forever"
+            "help": "This is the Shardeum Documentation"
         }
     ]
 }
