@@ -31,12 +31,8 @@ async function fetchStatus(): Promise<ServicesData> {
     next: {
       revalidate: 5,
     },
-
   });
   const jsonResponse = await response.json();
-  console.log(jsonResponse.data.result);
-
-
   const services: Service[] = jsonResponse.data.result.map((item: any) => ({
     name: item.metric.name,
     status: {

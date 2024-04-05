@@ -1,3 +1,4 @@
+
 const navigation = {
     main: [
         { name: 'About', href: 'https://shardeum.org/' },

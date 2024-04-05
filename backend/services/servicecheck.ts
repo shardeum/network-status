@@ -18,10 +18,6 @@ interface Endpoint {
         id: number;
     };
 }
-interface Group {
-    group: string;
-    servers: Endpoint[];
-}
 
 class HealthChecker {
     static instance: HealthChecker;
@@ -46,6 +42,7 @@ class HealthChecker {
     }
 
     flattenEndpoints(urls: any[]) {
+        // If an endpoint is part of a group, it is flattened so that each service can be checked individually.
         return urls.flatMap(endpoint => 'servers' in endpoint ? endpoint.servers : [endpoint]);
     }
 
@@ -58,17 +55,16 @@ class HealthChecker {
             const durationInSeconds = (Date.now() - startTime) / 1000;
             this.serviceHealthGauge.labels(service.name, durationInSeconds, Date.now()).set(1);
             this.checkingStatus.set(service.name, false);
-
-            return { name: service.name, status: 'online', lastChecked: new Date() };
         } catch (error) {
             const durationInSeconds = (Date.now() - startTime) / 1000;
             this.serviceHealthGauge.labels(service.name, durationInSeconds, Date.now()).set(0);
             this.checkingStatus.set(service.name, false);
-            return { name: service.name, status: 'offline', lastChecked: new Date(), error: error };
+
         }
     }
 
-    async checkServiceWithTimeout(service: Endpoint, timeout = 120000) { // Any ongoing service check should not take longer than 2 minutes
+    async checkServiceWithTimeout(service: Endpoint, timeout = 120000) {
+        // Any ongoing service check should not take longer than 2 minutes
         const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Service check timed out')), timeout)
         );

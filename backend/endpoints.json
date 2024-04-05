@@ -6,12 +6,25 @@
                 {
                     "url": "http://172.105.153.160:4000/nodelist",
                     "name": "Archiver 1",
-                    "help": "This is the first Archiver server"
+                    "help": "This is the first Archiver server",
+                    "response":{
+                         "nodeList": [{}, {}],
+                        "sign":{
+                            "owner":"7af699dd711074eb96a8d1103e32b589e511613ebb0c6a789a9e8791b2b05f34"
+                        }
+                    }
                 },
                 {
+                    
                     "url": "http://172.105.153.160:4000/nodelistfaddada",
                     "name": "Archiver 2",
-                    "help": "This is the second Archiver server"
+                    "help": "This is the second Archiver server",
+                    "response":{
+                         "nodeList": [{}, {}],
+                        "sign":{
+                            "owner":"7af699dd711074eb96a8d1103e32b589e511613ebb0c6a789a9e8791b2b05f34"
+                        }
+                    }
                 }
             ]
         },
@@ -19,9 +32,10 @@
             "group": "Monitors Servers",
             "servers": [
                 {
-                    "url": "http://50.116.18.184:3000/summarasdsfy",
+                    "url": "http://50.116.18.184:3000/summary",
                     "name": "Monitor 1",
-                    "help": "This is the first Monitor server"
+                    "help": "This is the first Monitor server",
+                    "response": "Ascending"
                 }
             ]
         },
@@ -34,23 +48,30 @@
                 "method": "eth_gasPrice",
                 "params": [],
                 "id": 73
+            },
+            "response": {
+                    "jsonrpc": "2.0",
+                    "id": 73
             }
         }, 
         {
             "url": "https://explorer-sphinx.shardeum.org/",
             "name": "Explorer",
-            "help": "This is the Shardeum Explorer"
+            "help": "This is the Shardeum Explorer",
+            "response": "The Shardeum Betanet Explorer"
 
         },
         {
-            "url": "https://shardeum.org/",
+            "url": "https://shardeum.org",
             "name": "Website",
-            "help": "This is the Shardeum Website"
+            "help": "This is the Shardeum Website",
+            "response": "Shardeum | EVM based Sharded Layer 1 Blockchain"
         },
         {
             "url": "https://docs.shardeum.org/",
             "name": "Documentation",
-            "help": "This is the Shardeum Documentation"
+            "help": "This is the Shardeum Documentation",
+            "response": "Shardeum is a dynamic state sharded EVM-based L1 with low transaction fees forever"
         }
     ]
 }
