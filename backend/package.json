@@ -1,5 +1,6 @@
 {
   "name": "shardeum-status-server",
+  
   "version": "1.0.0",
   "description": "Shardeum Status Server to monitor the health of Shardeum systems",
   "main": "app.ts",
@@ -16,6 +17,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
     "https": "^1.0.0",
+    "node-fetch": "^3.3.2",
     "nodemon": "^3.1.0",
     "prom-client": "^15.1.0",
     "response-time": "^2.3.2"

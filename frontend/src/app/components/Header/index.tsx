@@ -4,14 +4,14 @@ import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/20/solid'
 export const Header = () => {
     const navigation = [
-        { name: 'Claim SHM', href: 'https://docs.shardeum.org/faucet/claim' },
-        { name: 'Join Betanet Sphinx', href: 'https://shardeum.org/betanet/' }
+        { name: 'Uptime Monitor', href: '/uptime' },
+        { name: 'Latency Graph', href: '/latency' }
     ]
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     return (
         <header>
             <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
-                <a href="#" className="-m-1.5 p-1.5">
+                <a href="/" className="-m-1.5 p-1.5">
                     <span className="sr-only">Shardeum</span>
                     <img className="h-16 w-auto" src="/assets/slogo.webp" alt="Shardeum Logo" />
                 </a>
