@@ -1,30 +1,4 @@
-
-
-interface ServiceLabel {
-  __name__: string;
-  duration: string;
-  help: string;
-  instance: string;
-  job: string;
-  name: string;
-  timestamp?: string;
-  url: string;
-}
-
-interface ServiceStatus {
-  value: number;
-  labels: ServiceLabel;
-}
-
-interface Service {
-  name: string;
-  status: ServiceStatus;
-}
-
-interface ServicesData {
-  services: Service[];
-}
-
+import { Service, ServicesData } from "../../types/service";
 async function fetchStatus(): Promise<ServicesData> {
   const url = process.env.NEXT_PUBLIC_PROMETHEUS_URL || '';
   const response = await fetch(url, {
