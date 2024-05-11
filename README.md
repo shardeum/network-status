@@ -5,7 +5,7 @@ This repo is developed to check for the Status of the Shardeum Network services.
 ### Getting Started.
 To get started, ensure you have `Node.js` installed preferably v18+ 
 
-###Installation
+### Installation
 1. Clone the Network Status Repository.
 > First clone the shardeum network Status repository to your local machine.
 ```
