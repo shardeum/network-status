@@ -17,20 +17,22 @@ git clone https://github.com/shardeum/network-status.git
 ```
 2. Install the required dependencies for the frontend and backend:
    > Fo the backend,
-   ```cd backend
+   ```
+     cd backend
       npm i
     ```
    1 This will install all the dependencies required for the backend
 
    > For the front end,
    > Change directory into the front end directory and install the dependencies as well.
-     ``` cd ..
+     ```
+     cd ..
      cd frontend
      npm i
      ```
      
   
 4. Start both the front end server and the backend server by changing into each of the directories and starting them Respectively using:
-   ```npm run dev
    ```
-   to start testing the network services locally.
+   npm run dev
+   ``` to start testing the network services locally.
