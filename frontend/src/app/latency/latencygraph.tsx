@@ -5,7 +5,6 @@ export default function LatencyGraph({ data, name }: Readonly<{ data: any, name:
     const details = {
         chart: {
             id: name,
-
             type: "line",
             animations: {
                 enabled: true,
@@ -13,9 +12,6 @@ export default function LatencyGraph({ data, name }: Readonly<{ data: any, name:
                 dynamicAnimation: {
                     speed: 2000
                 }
-            },
-            toolbar: {
-                show: false
             },
 
         },
@@ -26,17 +22,9 @@ export default function LatencyGraph({ data, name }: Readonly<{ data: any, name:
         },
         yaxis: [
             {
-                axisTicks: {
-                    show: true
-                },
                 axisBorder: {
                     show: true,
                     color: "#247BA0"
-                },
-                labels: {
-                    style: {
-                        colors: "#247BA0"
-                    }
                 },
                 title: {
                     text: "Response time (s)",
@@ -48,14 +36,11 @@ export default function LatencyGraph({ data, name }: Readonly<{ data: any, name:
                 }
             }
         ],
-        dataLabels: {
-            enabled: false
-        },
+
         stroke: {
             curve: 'straight',
         },
         title: {
-            // text: 'Latency Graph',
             text: name,
             align: 'left'
         },

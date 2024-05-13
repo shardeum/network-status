@@ -8,6 +8,7 @@ The services and their expected responses are contained in the `endpoints.jsoon`
 To run this server locally, follow these steps:
 
 * Clone the repository with `git clone https://github.com/shardeum/network-status.git`
+* Change into the backend directory with `cd backend`
 * Install the dependencies with `npm install`
 * Run the local dev server with: `npm start`
 * This should start the server on port 3002 from where it will feed data to Prometheus.
