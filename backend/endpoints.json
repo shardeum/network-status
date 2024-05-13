@@ -57,8 +57,7 @@
         {
             "url": "https://explorer-sphinx.shardeum.orgdfsgs/",
             "name": "Explorer",
-            "help": "This is the Shardeum Explorer",
-            "expectedResponse": "The Shardeum Betanet Explorer"
+            "help": "This is the Shardeum Explorer"
 
         },
         {
