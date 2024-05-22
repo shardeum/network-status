@@ -40,6 +40,7 @@ class HealthChecker {
     }
     flattenEndpoints(urls: any[]) {
         // If an endpoint is part of a group, it is flattened so that each service can be checked individually.
+        // If an endpoint is part of a group, it is flattened so that each service can be checked individually.
         return urls.flatMap(endpoint => 'servers' in endpoint ? endpoint.servers : [endpoint]);
     }
     async checkService(service: Endpoint) {
