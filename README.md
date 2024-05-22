@@ -16,8 +16,8 @@ git clone https://github.com/shardeum/network-status.git
 ```
 2. Install the required dependencies for the backend:
 
-3. Start the local development server for the backend project, run the following command:
-  > `npm start`
+3.To Start the local development server for the backend project, run the following command:
+> `npm start`
 This will start the local Node server on port `3002` (or your locally specified port). 
 > Your Prometheus server should be running on port 9090
 >  [how to set up Prometheus](https://github.com/shardeum/network-status/tree/main/backend#run-prometheus)
