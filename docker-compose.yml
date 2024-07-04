@@ -2,13 +2,26 @@ version: '3.8'
 
 services:
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "3002:3002"
+      - "9090:9090"  # Exposing Prometheus port
+    networks:
+      - shardeum-network
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - shardeum-network
+
+networks:
+  shardeum-network:
+    driver: bridge
