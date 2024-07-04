@@ -20,7 +20,7 @@
             "group": "Monitors Servers",
             "servers": [
                 {
-                    "url": "http://198.58.113.59:3000/summarydeghehrh ",
+                    "url": "http://198.58.113.59:3000/summary",
                     "name": "Monitor 1",
                     "help": "This is the first Monitor server",
                     "expectedResponse": "Ascending"
