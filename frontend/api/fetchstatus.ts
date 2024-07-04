@@ -50,11 +50,11 @@ function getLatestServicesData(services: Service[], limit: number): ServicesData
     const latestServices: any[] = [];
     latestServicesMap.forEach((serviceHistory, name) => {
         serviceHistory.sort((a: any, b: any) => parseInt(a.status.labels.timestamp || '0') - parseInt(b.status.labels.timestamp || '0'))
-        const recentServices = serviceHistory.slice(0, limit);
+        const recentServices = serviceHistory.slice(-limit);
         const uptime = calculateUptimePercentage(recentServices);
         latestServices.push({
             name,
-            status: recentServices[0].status,
+            status: recentServices[recentServices.length - 1].status,
             uptimePercentage: uptime,
             last10services: recentServices
         });
