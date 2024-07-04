@@ -1,28 +1,16 @@
 {
     "urls": [
         {
-            "group": "Archivers Servers",
+            "group": "Archiver Servers",
             "servers": [
                 {
-                    "url": "http://172.105.153.160:4000/nodelist",
+                    "url": "http://198.58.110.213:4000/nodelist",
                     "name": "Archiver 1",
                     "help": "This is the first Archiver server",
                     "expectedResponse":{
                          "nodeList": [{}, {}],
                         "sign":{
-                            "owner":"7af699dd711074eb96a8d1103e32b589e511613ebb0c6a789a9e8791b2b05f34"
-                        }
-                    }
-                },
-                {
-                    
-                    "url": "http://172.105.153.160:4000/nodelist",
-                    "name": "Archiver 2",
-                    "help": "This is the second Archiver server",
-                    "expectedResponse":{
-                         "nodeList": [{}, {}],
-                        "sign":{
-                            "owner":"7af699dd711074eb96a8d1103e32b589e511613ebb0c6a789a9e8791b2b05f34"
+                            "owner":"d34b80a5a6f9638b7c75d6eb6e59d35d9a3e103f1877827eebbe973b8281f794"
                         }
                     }
                 }
@@ -32,7 +20,7 @@
             "group": "Monitors Servers",
             "servers": [
                 {
-                    "url": "http://50.116.18.184:3000/summary",
+                    "url": "http://198.58.113.59:3000/summarydeghehrh ",
                     "name": "Monitor 1",
                     "help": "This is the first Monitor server",
                     "expectedResponse": "Ascending"
@@ -40,7 +28,7 @@
             ]
         },
         {
-            "url": "http://72.14.184.233:8080",
+            "url": "http://34.29.238.58:8090",
             "name": "JSON-RPC Server",
             "help": "This is the first JSON-RPC server",
             "body": {
@@ -55,9 +43,10 @@
             }
         }, 
         {
-            "url": "https://explorer-sphinx.shardeum.orgdfsgs/",
+            "url": "https://explorer-atomium.shardeum.org/",
             "name": "Explorer",
-            "help": "This is the Shardeum Explorer"
+            "help": "This is the Shardeum Explorer",
+            "expectedResponse": "The Shardeum Atomium Explorer"
 
         },
         {
@@ -70,7 +59,7 @@
             "url": "https://docs.shardeum.org/",
             "name": "Documentation",
             "help": "This is the Shardeum Documentation",
-            "expectedResponse": "Shardeum is a dynamic state sharded EVM-based L1 with low transaction fees forever"
+            "expectedResponse": "Shardeum Documentation"
         }
     ]
 }
