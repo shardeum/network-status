@@ -1,10 +1,10 @@
-# Stage 1: Build the Node.js application
-FROM node:18.17.0 AS node-builder
+# Use an official Node.js runtime as the base image
+FROM node:18
 
-# Set working directory
-WORKDIR /app
+# Set the working directory in the container
+WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the container
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
@@ -13,25 +13,14 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Stage 2: Set up Prometheus with custom config
-FROM prom/prometheus:v2.47.0
+# Install Prometheus
+RUN apt-get update && apt-get install -y prometheus
 
-# Create the Prometheus configuration file
-RUN echo 'global:' > /etc/prometheus/prometheus.yml && \
-    echo '  scrape_interval: 60s' >> /etc/prometheus/prometheus.yml && \
-    echo 'scrape_configs:' >> /etc/prometheus/prometheus.yml && \
-    echo '  - job_name: '"'"'shardeum_services'"'" >> /etc/prometheus/prometheus.yml && \
-    echo '    static_configs:' >> /etc/prometheus/prometheus.yml && \
-    echo '      - targets: ['"'"'127.0.0.1:3002'"'"']' >> /etc/prometheus/prometheus.yml
+# Copy the Prometheus configuration file
+COPY prometheus.yml /etc/prometheus/prometheus.yml
 
-# Copy the Node.js application from the previous stage
-COPY --from=node-builder /app /app
+# Expose the ports the app runs on
+EXPOSE 3002 9090
 
-# Set working directory for the Node.js app
-WORKDIR /app
-
-# Expose ports for Prometheus and your Node.js application
-EXPOSE 9090 3002
-
-# Command to run both Prometheus and your Node.js app
-CMD ["/usr/local/bin/start.sh"]
+# Start both the Node.js application and Prometheus
+CMD ["sh", "-c", "prometheus --config.file=/etc/prometheus/prometheus.yml & npm start"]
