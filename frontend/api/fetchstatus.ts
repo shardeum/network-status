@@ -1,6 +1,6 @@
 import { Service, ServicesData } from "../types/service";
 
-export async function fetchStatus(noOfService = 10): Promise<ServicesData> {
+export async function fetchStatus(noOfService = 60): Promise<ServicesData> {
     // Fetch data from Prometheus
     const response = await fetchPrometheusData();
     // Map response to services array
@@ -12,20 +12,28 @@ export async function fetchStatus(noOfService = 10): Promise<ServicesData> {
 
 async function fetchPrometheusData() {
     // Define start, end, and step parameters for prometheus query range
-    const start = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
+    const start = Math.floor(Date.now() / 1000) - 7200; // 2 hours ago
     const end = Math.floor(Date.now() / 1000); // now
     const step = 60; // 60 seconds
     const query = encodeURIComponent('Shardeum');
     const url = process.env.NEXT_PUBLIC_PROMETHEUS_URL_RANGE + `?query=${query}&start=${start}&end=${end}&step=${step}`;
-    const response = await fetch(url, {
-        next: {
-            revalidate: 5,
-        },
-    });
-    if (!response.ok) {
-        throw new Error(`Failed to fetch data. Status: ${response.status}`);
+    try {
+
+        const response = await fetch(url, {
+            next: {
+                revalidate: 5,
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data. Status: ${response.status}`);
+        }
+        return await response.json();
+        
+    } catch (error) {
+        console.log('Error fetching status:', error);
+        return { data: { result: [] } };
+        
     }
-    return await response.json();
 }
 
 function mapToServices(data: any): Service[] {
@@ -50,11 +58,11 @@ function getLatestServicesData(services: Service[], limit: number): ServicesData
     const latestServices: any[] = [];
     latestServicesMap.forEach((serviceHistory, name) => {
         serviceHistory.sort((a: any, b: any) => parseInt(a.status.labels.timestamp || '0') - parseInt(b.status.labels.timestamp || '0'))
-        const recentServices = serviceHistory.slice(0, limit);
+        const recentServices = serviceHistory.slice(-limit);
         const uptime = calculateUptimePercentage(recentServices);
         latestServices.push({
             name,
-            status: recentServices[0].status,
+            status: recentServices[recentServices.length - 1].status,
             uptimePercentage: uptime,
             last10services: recentServices
         });

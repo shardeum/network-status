@@ -13,18 +13,6 @@
                             "owner":"7af699dd711074eb96a8d1103e32b589e511613ebb0c6a789a9e8791b2b05f34"
                         }
                     }
-                },
-                {
-                    
-                    "url": "http://172.105.153.160:4000/nodelist",
-                    "name": "Archiver 2",
-                    "help": "This is the second Archiver server",
-                    "expectedResponse":{
-                         "nodeList": [{}, {}],
-                        "sign":{
-                            "owner":"7af699dd711074eb96a8d1103e32b589e511613ebb0c6a789a9e8791b2b05f34"
-                        }
-                    }
                 }
             ]
         },
@@ -70,7 +58,7 @@
             "url": "https://docs.shardeum.org/",
             "name": "Documentation",
             "help": "This is the Shardeum Documentation",
-            "expectedResponse": "Shardeum is a dynamic state sharded EVM-based L1 with low transaction fees forever"
+            "expectedResponse": "Shardeum is a scalable, secure, and efficient blockchain platform that enables developers to build and deploy decentralized applications. Dive into our documentation to learn more about Shardeum and how to get started with the network"
         }
     ]
 }
