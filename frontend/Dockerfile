@@ -33,7 +33,6 @@ COPY --from=builder /app/.next/standalone ./.next/standalone
 COPY --from=builder /app/.next/ ./.next/
 
 # Set correct permissions
-RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
 USER nextjs
@@ -42,4 +41,5 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-CMD ["node", "server.js"]
+# CMD ["node", "server.js"]
+CMD ["node", ".next/standalone/server.js"]
