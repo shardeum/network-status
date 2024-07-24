@@ -1,40 +1,6 @@
-import { Service, ServicesData } from "../../types/service";
-async function fetchStatus(): Promise<ServicesData> {
-  const url = process.env.NEXT_PUBLIC_PROMETHEUS_URL || '';
-  const response = await fetch(url, {
-    next: {
-      revalidate: 5,
-    },
-  });
-  const jsonResponse = await response.json();
-  const services: Service[] = jsonResponse.data.result.map((item: any) => ({
-    name: item.metric.name,
-    status: {
-      value: parseInt(item.value[1], 10),
-      labels: item.metric,
-    },
-  }));
-
-  const latestServicesMap = services.reduce<Record<string, Service>>((acc, currentService) => {
-    const existingService = acc[currentService.name];
-    const existingTimestamp = existingService?.status.labels.timestamp
-      ? parseInt(existingService.status.labels.timestamp, 10)
-      : 0;
-    const currentTimestamp = currentService.status.labels.timestamp
-      ? parseInt(currentService.status.labels.timestamp, 10)
-      : 0;
-
-    if (!existingService || currentTimestamp > existingTimestamp) {
-      acc[currentService.name] = currentService;
-    }
-
-    return acc;
-  }, {});
-
-  const latestServices = Object.values(latestServicesMap);
-  return { services: latestServices };
-}
-
+import { Service } from "../../types/service";
+import { fetchStatus } from "../../api";
+export const dynamic = 'force-dynamic'
 export default async function Home() {
   const data = await fetchStatus()
   const { services } = data;
