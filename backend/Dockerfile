@@ -19,9 +19,6 @@ RUN apt-get update && apt-get install -y prometheus
 # Copy the Prometheus configuration file
 COPY prometheus.yml /etc/prometheus/prometheus.yml
 
-# Copy the entry script
-COPY entry.sh /usr/src/app/entry.sh
-
 # Make the entry script executable
 RUN chmod +x /usr/src/app/entry.sh
 
@@ -29,4 +26,4 @@ RUN chmod +x /usr/src/app/entry.sh
 EXPOSE 3002 9090
 
 # Start both the Node.js application and Prometheus
-CMD ["/usr/src/app/entry.sh"]
+CMD ["./entry.sh"]
