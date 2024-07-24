@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as the base image
-FROM node:18
+FROM node:20
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
@@ -23,4 +23,4 @@ COPY prometheus.yml /etc/prometheus/prometheus.yml
 EXPOSE 3002 9090
 
 # Start both the Node.js application and Prometheus
-CMD ["sh", "-c", "prometheus --config.file=/etc/prometheus/prometheus.yml & npm start"]
+CMD ["entry.sh"]
