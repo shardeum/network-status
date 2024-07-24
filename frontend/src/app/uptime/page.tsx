@@ -2,7 +2,7 @@ import { fetchStatus } from "../../../api/fetchstatus";
 import { Service } from "../../../types/service";
 
 export default async function Home() {
-    const data = await fetchStatus(62)
+    const data = await fetchStatus(60)
     const { services } = data;
 
     return (
@@ -14,8 +14,9 @@ export default async function Home() {
                         <h5 className=" text-black text-xl font-bold tracking-tight">{service.name}</h5>
                         <div className=" flex justify-between">
                             <div className="flex flex-col flex-1">
-                                <div className="w-full flex gap-1 mt-2">
-                                    {service.last10services.map((lastService, index) => {
+                                <div className="w-full flex gap-[1px] mt-2 px-4">
+                                <div className="w-[95%] flex gap-[2px]">
+                                    {service.last10services.slice(-60).map((lastService, index) => {
                                         const dateTime = new Intl.DateTimeFormat('en-US', {
                                             year: 'numeric',
                                             month: 'numeric',
@@ -29,13 +30,13 @@ export default async function Home() {
                                             <div
                                                 className={`has-tooltip w-[10px] h-full flex ${lastService.status.value === 1 ? 'bg-green-500' : 'bg-red-500'}`}
                                                 key={lastService.name + index} >
-                                                {/* <span className='tooltip rounded shadow-lg p-1 bg-gray-100 text-orange-950 -mt-8'>{dateTime}</span> */}
+                                                <span className='tooltip rounded shadow-lg p-1 bg-gray-100 text-orange-950 -mt-8'>{dateTime}</span>
                                                 &nbsp;
                                             </div>
                                         )
                                     }
                                     )}
-
+                                </div>
 
                                 </div>
                             </div>
