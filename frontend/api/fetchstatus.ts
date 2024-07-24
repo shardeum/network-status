@@ -18,10 +18,9 @@ async function fetchPrometheusData() {
     const query = encodeURIComponent('Shardeum');
     const url = process.env.NEXT_PUBLIC_PROMETHEUS_URL_RANGE + `?query=${query}&start=${start}&end=${end}&step=${step}`;
     try {
-
         const response = await fetch(url, {
             next: {
-                revalidate: 5,
+                revalidate: 60,
             },
         });
         if (!response.ok) {
