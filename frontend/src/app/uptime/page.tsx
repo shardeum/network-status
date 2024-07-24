@@ -1,6 +1,8 @@
 import { fetchStatus } from "../../../api/fetchstatus";
 import { Service } from "../../../types/service";
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
     const data = await fetchStatus(60)
     const { services } = data;
