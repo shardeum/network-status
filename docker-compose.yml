@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
@@ -12,13 +12,16 @@ services:
       - shardeum-network
 
   frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - backend
+    environment:
+      NEXT_PUBLIC_PROMETHEUS_URL_RANGE: "http://backend:9090/api/v1/query_range"
+      NEXT_PUBLIC_PROMETHEUS_URL: "http://localhost:9090/api/v1/query?query=Shardeum"
     networks:
       - shardeum-network
 

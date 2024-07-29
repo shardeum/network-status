@@ -15,6 +15,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Set environment variable
+ENV NEXT_PUBLIC_PROMETHEUS_URL_RANGE="http://backend:9090/api/v1/query_range"
+ENV NEXT_PUBLIC_PROMETHEUS_URL="http://localhost:9090/api/v1/query?query=Shardeum"
+
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
