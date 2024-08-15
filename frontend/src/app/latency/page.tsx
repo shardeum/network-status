@@ -5,10 +5,10 @@ const LatencyGraph = dynamic(() => import("../latency/latencygraph"), { ssr: fal
 
 
 export default async function Home() {
-    const data = await fetchStatus(10)
+    const data = await fetchStatus()
     const { services } = data;
 
-    const serverServicesName = ["monitor", "json-rpc", "archiver"];
+    const serverServicesName = ["monitor", "json-rpc", "archiver", "faucet"];
     const websiteServicesName = ["documentation", "explorer", "website"];
 
     const serverServices = [] as Service[];

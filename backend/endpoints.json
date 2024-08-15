@@ -4,13 +4,13 @@
             "group": "Archivers Servers",
             "servers": [
                 {
-                    "url": "http://172.105.153.160:4000/nodelist",
+                    "url": "http://198.58.110.213:4000/nodelist",
                     "name": "Archiver 1",
                     "help": "This is the first Archiver server",
                     "expectedResponse":{
                          "nodeList": [{}, {}],
                         "sign":{
-                            "owner":"7af699dd711074eb96a8d1103e32b589e511613ebb0c6a789a9e8791b2b05f34"
+                            "owner":"d34b80a5a6f9638b7c75d6eb6e59d35d9a3e103f1877827eebbe973b8281f794"
                         }
                     }
                 }
@@ -20,7 +20,7 @@
             "group": "Monitors Servers",
             "servers": [
                 {
-                    "url": "http://50.116.18.184:3000/summary",
+                    "url": "http://198.58.113.59:3000/summary",
                     "name": "Monitor 1",
                     "help": "This is the first Monitor server",
                     "expectedResponse": "Ascending"
@@ -28,7 +28,7 @@
             ]
         },
         {
-            "url": "http://72.14.184.233:8080",
+            "url": "http://139.162.162.217:8080",
             "name": "JSON-RPC Server",
             "help": "This is the first JSON-RPC server",
             "body": {
@@ -43,9 +43,10 @@
             }
         }, 
         {
-            "url": "https://explorer-sphinx.shardeum.orgdfsgs/",
+            "url": "https://explorer-atomium.shardeum.org",
             "name": "Explorer",
-            "help": "This is the Shardeum Explorer"
+            "help": "This is the Shardeum Explorer",
+            "expectedResponse": "The Shardeum Betanet Explorer"
 
         },
         {
@@ -59,6 +60,14 @@
             "name": "Documentation",
             "help": "This is the Shardeum Documentation",
             "expectedResponse": "Shardeum is a scalable, secure, and efficient blockchain platform that enables developers to build and deploy decentralized applications. Dive into our documentation to learn more about Shardeum and how to get started with the network"
+        },
+        {
+            "url": "https://faucet-atomium.shardeum.org/is-healthy",
+            "name": "Faucet",
+            "help": "This is the Shardeum Faucet",
+            "expectedResponse": {
+                "health": true
+            }
         }
     ]
 }
