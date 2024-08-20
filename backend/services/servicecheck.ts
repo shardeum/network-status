@@ -132,8 +132,7 @@ class HealthChecker {
     }
     startPeriodicChecks() {
         this.runChecksWithTimeout();
-
-        setInterval(() => this.runChecksWithTimeout(), 120000); // Run checks every 5 minutes
+        setInterval(() => this.runChecksWithTimeout(), 300000); // Run checks every 5 minutes
     }
 }
 
