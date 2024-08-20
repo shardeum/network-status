@@ -10,6 +10,9 @@ It provides users with information about the health of the Shardeum network, upt
 * To get started, ensure you have `Node.js` installed preferably v18+ 
 * Adhere to the requirements of each submodule (frontend & backend)
 
+### Monitored Services
+The services we monitor are defined in [the endpoints.json](https://github.com/shardeum/network-status/blob/main/backend/endpoints.json) file which contains the URLs of each service along with their expected response structures.
+
 ### Installation
 
 #### Clone the Network Status Repository.
@@ -22,7 +25,7 @@ git clone https://github.com/shardeum/network-status.git
 ```
 
 #### Install the required dependencies for the frontend and backend:
- For the backend,
+**For the backend**,
 
  ```bash
  cd backend
@@ -41,13 +44,19 @@ This will start the local Node server on port `3002` (or your locally specified 
 
 > Your Prometheus server should be running on port 9090  [how to set up Prometheus](https://github.com/shardeum/network-status/tree/main/backend#run-prometheus)
 > 
-For the frontend project, change directory into the frontend directory and install the dependencies.
+**For the frontend,** 
+
+Change directory into the frontend directory and install the dependencies.
 
 ```bash
 cd ..
 cd frontend
 npm i
 ```
+#### Set up environment variables
+Next, copy over the contents of [.env.example](https://github.com/shardeum/network-status/blob/main/frontend/.env.example) to your local `.env` file in the frontend directory.
+
+#### Run the project
 Start the frontend server by running the following command:
 
 ```bash
