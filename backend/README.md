@@ -1,7 +1,7 @@
 # Shardeum Status Server
 
 This is a Node server that monitors the Shardeum network on a set interval and feeds the data to Prometheus (A time series database we are using to store metrics).
-The services and their expected responses are contained in the `endpoints.jsoon` file within the backend folder.
+The services and their expected responses are contained in the `endpoints.json` file within the backend folder.
 
 ## Running it locally
 
