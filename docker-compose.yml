@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+      - "9090:9090"  # Exposing Prometheus port
+    networks:
+      - shardeum-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_PROMETHEUS_URL_RANGE: "http://backend:9090/api/v1/query_range"
+      NEXT_PUBLIC_PROMETHEUS_URL: "http://localhost:9090/api/v1/query?query=Shardeum"
+    networks:
+      - shardeum-network
+
+networks:
+  shardeum-network:
+    driver: bridge
