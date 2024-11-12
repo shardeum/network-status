@@ -1,5 +1,7 @@
+'use client'
 import { fetchStatus } from "../../../api/fetchstatus";
 import { Service } from "../../../types/service";
+import { formatDistanceToNow } from 'date-fns';
 
 export const dynamic = 'force-dynamic'
 
@@ -7,18 +9,27 @@ export default async function Home() {
     const data = await fetchStatus(60)
     const { services } = data;
 
+    // Calculate timestamp for 24 hours ago
+    const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+
     return (
         <main className="flex flex-col items-center p-24 bg-white">
             <h1 className="text-black font-regular my-2 text-xl text-left justify-start w-full max-w-[930px]">Uptime Monitor</h1>
             <div className="flex w-full max-w-[930px] h-full gap-2 gap-y-5 p-2 items-center flex-wrap">
-                {services.map((service: Service, index: any) => (
+                {services.map((service: Service, index: any) => {
+                    // Filter services to only show last 24 hours
+                    const last24HourServices = service.last10services.filter(s => 
+                        Number(s.status.labels.timestamp) > twentyFourHoursAgo
+                    );
+
+                    return (
                     <div className="w-full p-6 bg-white border border-gray-200 rounded-lg shadow" key={index + service.name} >
                         <h5 className=" text-black text-xl font-bold tracking-tight">{service.name}</h5>
                         <div className=" flex justify-between">
                             <div className="flex flex-col flex-1">
                                 <div className="w-full flex gap-[1px] mt-2 px-4">
                                 <div className="w-[95%] flex gap-[2px]">
-                                    {service.last10services.slice(-60).map((lastService, index) => {
+                                    {last24HourServices.map((lastService, index) => {
                                         const dateTime = new Intl.DateTimeFormat('en-US', {
                                             year: 'numeric',
                                             month: 'numeric',
@@ -30,14 +41,30 @@ export default async function Home() {
 
                                         return (
                                             <div
-                                                className={`has-tooltip w-[10px] h-full flex ${lastService.status.value === 1 ? 'bg-green-500' : 'bg-red-500'}`}
-                                                key={lastService.name + index} >
-                                                <span className='tooltip rounded shadow-lg p-1 bg-gray-100 text-orange-950 -mt-8'>{dateTime}</span>
+                                                className={`has-tooltip w-[10px] h-full flex cursor-pointer ${lastService.status.value === 1 ? 'bg-green-500' : 'bg-red-500'}`}
+                                                key={lastService.name + index}
+                                                onClick={() => {
+                                                    alert(
+                                                        `Status: ${lastService.status.value === 1 ? 'Up' : 'Down'}\n` +
+                                                        `Time: ${new Intl.DateTimeFormat('en-US', {
+                                                            month: 'short',
+                                                            day: 'numeric', 
+                                                            hour: 'numeric',
+                                                            minute: '2-digit'
+                                                        }).format(Number(lastService.status.labels.timestamp))}\n` +
+                                                        `${lastService.status.value === 0 ? 'Error: Service was unreachable' : 'Service was operating normally'}`
+                                                    )
+                                                }}>
+                                                <span className='tooltip rounded shadow-lg p-1 bg-gray-100 text-orange-950 -mt-8'>{new Intl.DateTimeFormat('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    hour: 'numeric',
+                                                    minute: '2-digit'
+                                                }).format(Number(lastService.status.labels.timestamp))}</span>
                                                 &nbsp;
                                             </div>
                                         )
-                                    }
-                                    )}
+                                    })}
                                 </div>
 
                                 </div>
@@ -70,20 +97,24 @@ export default async function Home() {
                         <div className="mt-2 flex w-full justify-between items-center gap-2">
 
                             <div className="item light legend-item-date-range">
-                                <span className="availability-time-line-legend-day-count">1</span> hour ago
+                                <span className="availability-time-line-legend-day-count">
+                                    {formatDistanceToNow(new Date(Number(last24HourServices[0]?.status.labels.timestamp)))} ago
+                                </span>
                             </div>
                             <div className="spacer border h-[0.5px] flex-1"></div>
                             <div className="legend-item legend-item-uptime-value legend-item-pc5t8fy4tf59">
                                 <span id="font-bold">
-                                    <var data-var="uptime-percent">{Number(service.uptimePercentage).toFixed(2)}</var>
+                                    <var data-var="uptime-percent">
+                                        {(last24HourServices.filter(s => s.status.value === 1).length / last24HourServices.length * 100).toFixed(2)}
+                                    </var>
                                 </span>
                                 % uptime
                             </div>
                             <div className="spacer border  h-[0.5px] flex-1"></div>
-                            <div className="legend-item light legend-item-date-range">Today</div>
+                            <div className="legend-item light legend-item-date-range">{new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()}</div>
                         </div>
                     </div>
-                ))}
+                )})}
             </div>
         </main >
     );

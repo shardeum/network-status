@@ -8,6 +8,8 @@ services:
     ports:
       - "3002:3002"
       - "9090:9090"  # Exposing Prometheus port
+    volumes:
+      - prometheus-data:/prometheus-data
     networks:
       - shardeum-network
 
@@ -24,6 +26,9 @@ services:
       NEXT_PUBLIC_PROMETHEUS_URL: "http://localhost:9090/api/v1/query?query=Shardeum"
     networks:
       - shardeum-network
+
+volumes:
+  prometheus-data:
 
 networks:
   shardeum-network:
