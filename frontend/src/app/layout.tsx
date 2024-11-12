@@ -6,8 +6,8 @@ import { Footer } from "./components/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Shardeum Status",
-  description: "The Shardeum Status page",
+  title: "Shardeum Network Status",
+  description: "This is the Shardeum Network Status page",
 };
 
 export default function RootLayout({
@@ -17,6 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      
       <body className={inter.className}>
         <Header />
         {children}
