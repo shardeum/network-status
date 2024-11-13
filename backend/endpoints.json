@@ -4,13 +4,13 @@
             "group": "Archivers Servers",
             "servers": [
                 {
-                    "url": "http://198.58.110.213:4000/nodelist",
-                    "name": "Archiver 1",
+                    "url": "http://34.68.218.222:4000/nodelist",
+                    "name": "Archiver",
                     "help": "This is the first Archiver server",
                     "expectedResponse":{
                          "nodeList": [{}, {}],
                         "sign":{
-                            "owner":"d34b80a5a6f9638b7c75d6eb6e59d35d9a3e103f1877827eebbe973b8281f794"
+                            "owner":"64a3833499130406550729ab20f6bec351d04ec9be3e5f0144d54f01d4d18c45"
                         }
                     }
                 }
@@ -20,15 +20,15 @@
             "group": "Monitors Servers",
             "servers": [
                 {
-                    "url": "http://198.58.113.59:3000/summary",
-                    "name": "Monitor 1",
+                    "url": "http://54.185.250.216:3000/summary",
+                    "name": "Monitor ",
                     "help": "This is the first Monitor server",
                     "expectedResponse": "Ascending"
                 }
             ]
         },
         {
-            "url": "http://139.162.162.217:8080",
+            "url": "https://atomium.shardeum.org",
             "name": "JSON-RPC Server",
             "help": "This is the first JSON-RPC server",
             "body": {
