@@ -46,27 +46,36 @@ export default async function Home() {
                         <div className="flex justify-between">
                             <div className="flex flex-col flex-1">
                                 <div className="w-full flex gap-[1px] mt-2 px-2 sm:px-4">
-                                    <div className="w-[95%] flex gap-[1px] sm:gap-[2px]">
+                                    <div className="w-[95%] flex gap-[0.5px] sm:gap-[1px]">
                                         {last24HourServices.map((lastService, index) => {
                                             const timestamp = Number(lastService.status.labels.timestamp);
-                                            
                                             return (
-                                                <div
-                                                    className={`has-tooltip w-[8px] sm:w-[10px] h-full flex cursor-pointer ${lastService.status.value === 1 ? 'bg-green-500' : 'bg-red-500'}`}
-                                                    key={lastService.name + index}
-                                                    onClick={() => {
-                                                        alert(
-                                                            `Status: ${lastService.status.value === 1 ? 'Up' : 'Down'}\n` +
-                                                            `Time: ${formatDateTimeToLocal(timestamp)}\n` +
-                                                            `${lastService.status.value === 0 ? 'Error: Service was unreachable' : 'Service was operating normally'}`
-                                                        )
-                                                    }}>
-                                                    <span className='tooltip rounded shadow-lg p-1 bg-gray-100 text-orange-950 -mt-8 text-xs sm:text-sm'>
-                                                        {formatDateTimeToLocal(timestamp)}
-                                                    </span>
-                                                    &nbsp;
-                                                </div>
-                                            )
+                                            <div
+                                                className={`has-tooltip flex-1 h-full cursor-pointer ${
+                                                lastService.status.value === 1 ? 'bg-green-500' : 'bg-red-500'
+                                                }`}
+                                                key={lastService.name + index}
+                                                style={{ minWidth: '1px' }}
+                                                onClick={() => {
+                                                alert(
+                                                    `Status: ${
+                                                    lastService.status.value === 1 ? 'Up' : 'Down'
+                                                    }\n` +
+                                                    `Time: ${formatDateTimeToLocal(timestamp)}\n` +
+                                                    `${
+                                                        lastService.status.value === 0
+                                                        ? 'Error: Service was unreachable'
+                                                        : 'Service was operating normally'
+                                                    }`
+                                                );
+                                                }}
+                                            >
+                                                <span className="tooltip rounded shadow-lg p-1 bg-gray-100 text-orange-950 -mt-8 text-xs sm:text-sm">
+                                                {formatDateTimeToLocal(timestamp)}
+                                                </span>
+                                                &nbsp;
+                                            </div>
+                                            );
                                         })}
                                     </div>
                                 </div>
@@ -75,7 +84,7 @@ export default async function Home() {
                         <div className="mt-2 flex w-full justify-between items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
                             <div className="item light legend-item-date-range">
                                 <span className="availability-time-line-legend-day-count">
-                                    {formatDistanceToNow(new Date(Number(last24HourServices[0]?.status.labels.timestamp)))} ago
+                                    {formatDistanceToNow(new Date(Number(last24HourServices[0]?.status.labels.timestamp)))} ago 
                                 </span>
                             </div>
                             <div className="spacer border h-[0.5px] flex-1"></div>
