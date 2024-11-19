@@ -1,7 +1,7 @@
 "use client";
 import Chart from "react-apexcharts";
-export default function LatencyGraph({ data, name }: Readonly<{ data: any, name: string }>) {
 
+export default function LatencyGraph({ data, name }: Readonly<{ data: any, name: string }>) {
     const details = {
         chart: {
             id: name,
@@ -13,12 +13,19 @@ export default function LatencyGraph({ data, name }: Readonly<{ data: any, name:
                     speed: 2000
                 }
             },
-
         },
-
         xaxis: {
-            categories: [] as string[],
-
+            type: 'datetime',
+            labels: {
+                datetimeUTC: false,
+                formatter: function(value: string) {
+                    return new Date(Number(value)).toLocaleTimeString(undefined, {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                }
+            }
         },
         yaxis: [
             {
@@ -36,13 +43,23 @@ export default function LatencyGraph({ data, name }: Readonly<{ data: any, name:
                 }
             }
         ],
-
         stroke: {
             curve: 'straight',
         },
         title: {
             text: name,
             align: 'left'
+        },
+        tooltip: {
+            x: {
+                formatter: function(value: number) {
+                    return new Date(value).toLocaleTimeString(undefined, {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                }
+            }
         },
         colors: [
             "#387537",
@@ -63,26 +80,26 @@ export default function LatencyGraph({ data, name }: Readonly<{ data: any, name:
 
     const series: any[] = [];
 
-    const dataSeries = data.forEach((service: any) => {
-        series.push({
-            name: service.name,
-            data: service.last10services.map((service: any) => service.status.labels.duration)
-        })
-    })
+    data.forEach((service: any) => {
+        // Only include services that have duration data
+        const serviceData = service.last10services
+            .filter((s: any) => s.status.labels.duration !== undefined)
+            .map((s: any) => ({
+                x: new Date(Number(s.status.labels.timestamp)).getTime(),
+                y: Number(s.status.labels.duration).toFixed(2)
+            }));
 
-    const xAxis = data[0].last10services.map((service: any) => {
-        const dateTime = new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: 'numeric',
-        }).format(Number(service.status.labels.timestamp))
-
-        details.xaxis.categories?.push(dateTime);
+        if (serviceData.length > 0) {
+            series.push({
+                name: service.name,
+                data: serviceData
+            });
+        }
     });
-
 
     return (
         <div className="mb-16">
             <Chart options={details as any} series={series} type="line" height={520} />
         </div>
-    )
+    );
 }
