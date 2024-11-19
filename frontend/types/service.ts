@@ -8,6 +8,8 @@ interface ServiceLabel {
     name: string;
     timestamp?: string;
     url: string;
+    details?: string;
+    uptimePercentage?: number;
 }
 
 interface ServiceStatus {

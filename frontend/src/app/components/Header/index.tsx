@@ -4,8 +4,10 @@ import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/20/solid'
 export const Header = () => {
     const navigation = [
-        { name: 'Uptime Monitor', href: '/uptime' },
-        { name: 'Latency Graph', href: '/latency' }
+        { name: 'Realtime Status', href: '/realtime' },
+        { name: 'Hourly Status', href: '/hourly' },
+        { name: 'Daily Status', href: '/daily' },
+        { name: 'Latency Graph', href: '/latency' },
     ]
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     return (

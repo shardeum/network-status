@@ -1,43 +1,40 @@
 'use client'
-import { fetchStatus } from "../../api/fetchstatus";
-import { Service } from "../../types/service";
-import { formatDistanceToNow } from 'date-fns';
+import { fetchHistoricalStatus } from "../../../api/fetchhistoricalstatus";
+import { Service } from "../../../types/service";
 
 export const dynamic = 'force-dynamic'
 
-export default async function Home() {
-    const data = await fetchStatus(60)
+export default async function DailyStatus() {
+    const data = await fetchHistoricalStatus(30, 'daily');
     const { services } = data;
 
-    // Calculate timestamp for 24 hours ago
-    const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+    // Calculate timestamp for 30 days ago
+    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
 
-    // Format time consistently using users's timezone
-    const formatTimeToLocal = (timestamp: number) => {
-        return new Date(timestamp).toLocaleTimeString(undefined, { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-        }).toLowerCase();
+    // Format date for display
+    const formatDateToLocal = (timestamp: number) => {
+        return new Date(timestamp).toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric'
+        });
     };
 
-    // Format date with time for tooltips
-    const formatDateTimeToLocal = (timestamp: number) => {
-        return new Date(timestamp).toLocaleString(undefined, {
+    // Format date with day for tooltips
+    const formatDateWithDay = (timestamp: number) => {
+        return new Date(timestamp).toLocaleDateString(undefined, {
+            weekday: 'short',
             month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit'
+            day: 'numeric'
         });
     };
 
     return (
         <main className="flex flex-col items-center p-4 sm:p-8 md:p-16 lg:p-24 bg-white">
-            <h1 className="text-black font-regular my-2 text-lg sm:text-xl text-left justify-start w-full max-w-[930px]">Uptime Monitor</h1>
+            <h1 className="text-black font-regular my-2 text-lg sm:text-xl text-left justify-start w-full max-w-[930px]">30-Day Daily Uptime Monitor</h1>
             <div className="flex w-full max-w-[930px] h-full gap-2 gap-y-3 sm:gap-y-5 p-2 items-center flex-wrap">
                 {services.map((service: Service, index: any) => {
-                    const last24HourServices = service.last10services.filter(s => 
-                        Number(s.status.labels.timestamp) > twentyFourHoursAgo
+                    const last30DaysServices = service.last10services.filter(s => 
+                        Number(s.status.labels.timestamp) > thirtyDaysAgo
                     );
 
                     return (
@@ -46,34 +43,26 @@ export default async function Home() {
                         <div className="flex justify-between">
                             <div className="flex flex-col flex-1">
                                 <div className="w-full flex gap-[1px] mt-2 px-2 sm:px-4">
-                                    <div className="w-[95%] flex gap-[0.5px] sm:gap-[1px]">
-                                        {last24HourServices.map((lastService, index) => {
+                                    <div className="w-[95%] flex gap-1 sm:gap-2">
+                                        {last30DaysServices.map((lastService, index) => {
                                             const timestamp = Number(lastService.status.labels.timestamp);
                                             return (
                                             <div
-                                                className={`has-tooltip flex-1 h-full cursor-pointer ${
+                                                className={`has-tooltip flex-1 h-8 cursor-pointer ${
                                                 lastService.status.value === 1 ? 'bg-green-500' : 'bg-red-500'
                                                 }`}
                                                 key={lastService.name + index}
-                                                style={{ minWidth: '1px' }}
+                                                style={{ minWidth: '16px' }}
                                                 onClick={() => {
-                                                alert(
-                                                    `Status: ${
-                                                    lastService.status.value === 1 ? 'Up' : 'Down'
-                                                    }\n` +
-                                                    `Time: ${formatDateTimeToLocal(timestamp)}\n` +
-                                                    `${
-                                                        lastService.status.value === 0
-                                                        ? 'Error: Service was unreachable'
-                                                        : 'Service was operating normally'
-                                                    }`
-                                                );
+                                                    alert(lastService.status.labels.details);
+                                                    
                                                 }}
                                             >
                                                 <span className="tooltip rounded shadow-lg p-1 bg-gray-100 text-orange-950 -mt-8 text-xs sm:text-sm">
-                                                {formatDateTimeToLocal(timestamp)}
+                                                    {formatDateWithDay(timestamp)}
+                                                    <br/>
+                                                    Uptime: {lastService.status.labels.uptimePercentage}%
                                                 </span>
-                                                &nbsp;
                                             </div>
                                             );
                                         })}
@@ -84,21 +73,21 @@ export default async function Home() {
                         <div className="mt-2 flex w-full justify-between items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
                             <div className="item light legend-item-date-range">
                                 <span className="availability-time-line-legend-day-count">
-                                    {formatDistanceToNow(new Date(Number(last24HourServices[0]?.status.labels.timestamp)))} ago 
+                                    {formatDateToLocal(Number(last30DaysServices[0]?.status.labels.timestamp))}
                                 </span>
                             </div>
                             <div className="spacer border h-[0.5px] flex-1"></div>
                             <div className="legend-item legend-item-uptime-value whitespace-nowrap">
                                 <span id="font-bold">
                                     <var data-var="uptime-percent">
-                                        {(last24HourServices.filter(s => s.status.value === 1).length / last24HourServices.length * 100).toFixed(2)}
+                                        {(last30DaysServices.filter(s => s.status.value === 1).length / last30DaysServices.length * 100).toFixed(2)}
                                     </var>
                                 </span>
                                 % uptime
                             </div>
                             <div className="spacer border h-[0.5px] flex-1"></div>
                             <div className="legend-item light legend-item-date-range">
-                                {formatTimeToLocal(Date.now())}
+                                {formatDateToLocal(Date.now())}
                             </div>
                         </div>
                     </div>

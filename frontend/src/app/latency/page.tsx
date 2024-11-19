@@ -1,7 +1,7 @@
 import { fetchStatus } from "../../../api";
 import { Service } from "../../../types/service";
 import dynamic from "next/dynamic";
-const LatencyGraph = dynamic(() => import("../latency/latencygraph"), { ssr: false });
+const LatencyGraph = dynamic(() => import("./latencygraph"), { ssr: false });
 
 
 export default async function Home() {
