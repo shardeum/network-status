@@ -20,7 +20,7 @@
             "group": "Core Services",
             "servers": [
                 {
-                    "url": "https://atomium.shardeum.org",
+                    "url": "https://atomium.shardeum.orrrrg",
                     "name": "JSON-RPC Server",
                     "help": "This is the first JSON-RPC server",
                     "body": {
