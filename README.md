@@ -9,7 +9,6 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
 - 📈 Latency tracking and visualization
 - 🔄 Automatic retry mechanism for failed requests
 - 🚦 Status indicators with tooltips
-- 📱 Responsive design
 - 🎯 Group-based service organization
 
 ## Architecture
@@ -31,7 +30,7 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
    - Handles metric queries via PromQL
 
 3. **Next.js Frontend**
-   - Server-side rendered React application
+   - Server-side rendered React (Next.js) application
    - Real-time metric visualization
    - Multiple time-frame views
    - Responsive status indicators
@@ -75,17 +74,12 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
 
 3. **Start Prometheus**
    ```bash
-   npm run prometheus
+   npm run prometheus 
    ```
 
-4. **Start the Exporter**
+4. **Start the Exporter and Next.js**
    ```bash
-   npm run exporter
-   ```
-
-5. **Start Next.js**
-   ```bash
-   npm run dev
+   npm run start:all
    ```
 
 ## Configuration
