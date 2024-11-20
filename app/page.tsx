@@ -12,8 +12,8 @@ export default function Home() {
           <TabsList className="mb-6">
             <TabsTrigger value="minutes">Minutes</TabsTrigger>
             <TabsTrigger value="hourly">Hourly</TabsTrigger>
-            <TabsTrigger value="weekly">Weekly</TabsTrigger>
             <TabsTrigger value="daily">Daily</TabsTrigger>
+            <TabsTrigger value="weekly">Weekly</TabsTrigger>
             <TabsTrigger value="monthly">Monthly</TabsTrigger>
             <TabsTrigger value="latency">Latency</TabsTrigger>
           </TabsList>
