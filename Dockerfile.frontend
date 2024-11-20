@@ -11,6 +11,9 @@ RUN npm ci
 # Copy the rest of the application
 COPY . .
 
+# Create public directory if it doesn't exist
+RUN mkdir -p public
+
 # Build the application
 RUN npm run build
 
@@ -21,7 +24,7 @@ WORKDIR /app
 
 # Copy built assets and necessary files
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+COPY --from=builder /app/public ./public || true
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/next.config.js ./
 
