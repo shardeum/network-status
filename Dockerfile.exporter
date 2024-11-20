@@ -1,0 +1,16 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY server ./server/
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Expose exporter port
+EXPOSE 3002
+
+# Start the exporter
+CMD ["node", "server/exporter.js"]
