@@ -2,11 +2,16 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy all files
+# Copy package files first to leverage Docker cache
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy the rest of the application
 COPY . .
 
-# Install dependencies and build
-RUN npm ci
+# Build the application
 RUN npm run build
 
 # Production image
@@ -14,13 +19,13 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy built assets
+# Copy built assets and necessary files
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/next.config.js ./
 
-# Install production dependencies
+# Install production dependencies only
 RUN npm ci --only=production
 
 # Expose frontend port
