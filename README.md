@@ -1,66 +1,199 @@
-# Shardeum Network Monitoring Project
+# Service Monitor
 
-This repository is designed to monitor the status of the Shardeum Network services.
-It provides users with information about the health of the Shardeum network, uptime, and latency.
+A real-time monitoring system built with Next.js, Prometheus, and Express that tracks service availability and performance metrics across multiple endpoints.
 
-![Shardeum network status](https://res.cloudinary.com/kennyy/image/upload/v1716044789/CleanShot_2024-05-18_at_19.05.34_2x_kliwxi.png)
+## Features
 
+- 🔍 Real-time service monitoring
+- 📊 Multiple time-frame views (minutes, hourly, daily, weekly, monthly)
+- 📈 Latency tracking and visualization
+- 🔄 Automatic retry mechanism for failed requests
+- 🚦 Status indicators with tooltips
+- 📱 Responsive design
+- 🎯 Group-based service organization
 
-### Prerequisites.
-* To get started, ensure you have `Node.js` installed preferably v18+ 
-* Adhere to the requirements of each submodule (frontend & backend)
+## Architecture
 
-### Monitored Services
-The services we monitor are defined in [the endpoints.json](https://github.com/shardeum/network-status/blob/main/backend/endpoints.json) file which contains the URLs of each service along with their expected response structures.
+### Components
 
-### Installation
+1. **Prometheus Exporter (Express Server)**
+   - Runs on port 3002
+   - Collects metrics:
+     - `service_up`: Service availability (1 for up, 0 for down)
+     - `service_response_time`: Response time in milliseconds
+   - Implements retry logic for failed requests
+   - Handles concurrent service checks
 
-#### Clone the Network Status Repository.
+2. **Prometheus Server**
+   - Runs on port 9090
+   - Scrapes metrics from the exporter
+   - Stores time-series data
+   - Handles metric queries via PromQL
 
-First, clone the Shardeum network status repository to your local machine.
+3. **Next.js Frontend**
+   - Server-side rendered React application
+   - Real-time metric visualization
+   - Multiple time-frame views
+   - Responsive status indicators
+   - Latency graphs
 
+### Monitoring Logic
+
+#### Service Checks
+- Concurrent service checking (3 services at a time)
+- Configurable retry mechanism:
+  - Maximum retries: 3
+  - Retry delay: 1000ms (doubles with each retry)
+  - Timeout: 10 seconds per request
+
+#### Status Calculation
+- Service is considered "up" if:
+  - Response status is 200-299
+  - Response matches expected format/content
+  - More than 90% of checks in the interval are successful
+
+#### Refresh Intervals
+- Minutes view: 60 second refresh
+- Hourly view: 5 minute refresh
+- Daily/Weekly/Monthly views: 1 hour refresh
+
+## Setup
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Configure Endpoints**
+   - Edit `server/endpoints.json` to define monitored services
+   - Each service can specify:
+     - URL
+     - Expected response format
+     - Custom headers
+     - Request body
+     - Group assignment
+
+3. **Start Prometheus**
+   ```bash
+   npm run prometheus
+   ```
+
+4. **Start the Exporter**
+   ```bash
+   npm run exporter
+   ```
+
+5. **Start Next.js**
+   ```bash
+   npm run dev
+   ```
+
+## Configuration
+
+### Endpoint Configuration
+
+```json
+{
+  "urls": [
+    {
+      "group": "Group Name",
+      "servers": [
+        {
+          "url": "https://api.example.com",
+          "name": "Service Name",
+          "help": "Service description",
+          "expectedResponse": {
+            "field": "value"
+          },
+          "headers": {
+            "Authorization": "Bearer token"
+          },
+          "body": {
+            "key": "value"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Environment Variables
+
+- `PORT`: Exporter port (default: 3002)
+- `PROMETHEUS_URL`: Prometheus server URL (default: http://localhost:9090)
+- `ENDPOINTS_FILE`: Path to endpoints configuration (default: ./endpoints.json)
+
+## Development
+
+### Project Structure
 
 ```
-git clone https://github.com/shardeum/network-status.git
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Main page
+├── components/            # React components
+├── hooks/                 # Custom React hooks
+├── lib/                   # Utility functions
+├── server/               # Backend services
+│   ├── exporter.js       # Prometheus exporter
+│   └── endpoints.json    # Service configuration
+└── scripts/              # Helper scripts
 ```
 
-#### Install the required dependencies for the frontend and backend:
-**For the backend**,
+### Testing
 
- ```bash
- cd backend
- npm i
- ```
+1. **Test Environment**
+   ```bash
+   npm run test
+   ```
+   This starts:
+   - Test server (mock services)
+   - Prometheus exporter
+   - Next.js development server
 
-This will install all the dependencies required for the backend project (i.e Node.js server)
+2. **Test Endpoints**
+   - Located in `server/test-endpoints.json`
+   - Provides mock services for testing
 
-To start the local development server for the backend project, run the following command:
+## Timeframes and Data Points
 
-```bash
-npm start
-```
+- **Minutes**: 60 indicators (1 per minute)
+- **Hourly**: 24 indicators (1 per hour)
+- **Daily**: 30 indicators (1 per day)
+- **Weekly**: 7 indicators (1 per week)
+- **Monthly**: 12 indicators (1 per month)
 
-This will start the local Node server on port `3002` (or your locally specified port). 
+## Error Handling
 
-> Your Prometheus server should be running on port 9090  [how to set up Prometheus](https://github.com/shardeum/network-status/tree/main/backend#run-prometheus)
-> 
-**For the frontend,** 
+1. **Network Errors**
+   - Automatic retry with exponential backoff
+   - Maximum 3 retry attempts
+   - Failed services marked as down after all retries exhausted
 
-Change directory into the frontend directory and install the dependencies.
+2. **Response Validation**
+   - Checks HTTP status codes
+   - Validates response format against expected schema
+   - Handles partial matches for text responses
 
-```bash
-cd ..
-cd frontend
-npm i
-```
-#### Set up environment variables
-Next, copy over the contents of [.env.example](https://github.com/shardeum/network-status/blob/main/frontend/.env.example) to your local `.env` file in the frontend directory.
+3. **Metric Collection**
+   - Graceful handling of missing data points
+   - Automatic recovery from Prometheus connection issues
+   - Fallback to cached data when available
 
-#### Run the project
-Start the frontend server by running the following command:
+## Contributing
 
-```bash
-npm run dev
-```
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-This will start the local development server for the frontend project on port `3000` (or your locally specified port).
+## License
+
+MIT License - feel free to use this project for any purpose.
+
+## Support
+
+For issues and feature requests, please create an issue in the repository.

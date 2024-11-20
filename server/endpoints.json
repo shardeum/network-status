@@ -1,0 +1,77 @@
+{
+    "urls": [
+        {
+            "group": "Archivers Servers",
+            "servers": [
+                {
+                    "url": "http://34.68.218.222:4000/nodelistt",
+                    "name": "Archiver",
+                    "help": "This is the first Archiver server",
+                    "expectedResponse":{
+                         "nodeList": [{}, {}],
+                        "sign":{
+                            "owner":"64a3833499130406550729ab20f6bec351d04ec9be3e5f0144d54f01d4d18c45"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "group": "Core Services",
+            "servers": [
+                {
+                    "url": "https://atomium.shardeum.org",
+                    "name": "JSON-RPC Server",
+                    "help": "This is the first JSON-RPC server",
+                    "body": {
+                        "jsonrpc": "2.0",
+                        "method": "eth_gasPrice",
+                        "params": [],
+                        "id": 73
+                    },
+                    "expectedResponse": {
+                        "jsonrpc": "2.0",
+                        "id": 73
+                    }
+                },
+                {
+                    "url": "https://explorer-atomium.shardeum.org",
+                    "name": "Explorer",
+                    "help": "This is the Shardeum Explorer",
+                    "expectedResponse": "The Shardeum Betanet Explorer"
+                },
+                {
+                    "url": "https://shardeum.org",
+                    "name": "Website",
+                    "help": "This is the Shardeum Website",
+                    "expectedResponse": "Shardeum | EVM based Sharded Layer 1 Blockchain"
+                },
+                {
+                    "url": "https://docs.shardeum.org/",
+                    "name": "Documentation",
+                    "help": "This is the Shardeum Documentation",
+                    "expectedResponse": "Shardeum is a scalable, secure, and efficient blockchain platform that enables developers to build and deploy decentralized applications. Dive into our documentation to learn more about Shardeum and how to get started with the network"
+                },
+                {
+                    "url": "https://faucet-atomium.shardeum.org/is-healthy",
+                    "name": "Faucet",
+                    "help": "This is the Shardeum Faucet",
+                    "expectedResponse": {
+                        "health": true
+                    }
+                }
+            ]
+        },
+        {
+            "group": "Monitors Servers",
+            "servers": [
+                {
+                    "url": "http://54.185.250.216:3000/summary",
+                    "name": "Monitor",
+                    "help": "This is the first Monitor server",
+                    "expectedResponse": "Ascending"
+                }
+            ]
+        }
+    ]
+}
