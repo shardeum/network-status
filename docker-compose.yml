@@ -13,6 +13,8 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - monitor-network
 
   exporter:
     build:
@@ -23,6 +25,8 @@ services:
     environment:
       - NODE_ENV=production
     restart: unless-stopped
+    networks:
+      - monitor-network
 
   frontend:
     build:
@@ -37,6 +41,12 @@ services:
       - prometheus
       - exporter
     restart: unless-stopped
+    networks:
+      - monitor-network
+
+networks:
+  monitor-network:
+    driver: bridge
 
 volumes:
   prometheus_data:
