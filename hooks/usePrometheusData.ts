@@ -1,14 +1,30 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { 
+  startOfHour, 
+  startOfDay, 
+  startOfWeek, 
+  startOfMonth,
+  subHours,
+  subDays,
+  subWeeks,
+  subMonths,
+  eachHourOfInterval,
+  eachDayOfInterval,
+  eachWeekOfInterval,
+  eachMonthOfInterval
+} from 'date-fns';
 
 interface ServiceData {
   name: string;
   group: string;
-  dataPoints: Array<{
-    timestamp: number;
-    value: string;
+  uptime: Array<{
+    status: number;
+    timestamp: Date;
+    uptimePercentage: number;
   }>;
   uptimePercentage: number;
 }
@@ -26,33 +42,27 @@ export function usePrometheusData(timeframe: 'minutes' | 'hourly' | 'weekly' | '
         // Calculate time range and step based on timeframe
         let range: string;
         let step: string;
-        let maxDataPoints: number;
-
+        
         switch (timeframe) {
           case 'minutes':
             range = '1h';
             step = '60'; // 1 minute intervals
-            maxDataPoints = 60;
             break;
           case 'hourly':
             range = '24h';
             step = '3600'; // 1 hour intervals
-            maxDataPoints = 24;
             break;
           case 'weekly':
-            range = '7w';
-            step = '604800'; // 1 week intervals
-            maxDataPoints = 7;
+            range = '7d';
+            step = '86400'; // 1 day intervals
             break;
           case 'daily':
             range = '30d';
             step = '86400'; // 1 day intervals
-            maxDataPoints = 30;
             break;
           case 'monthly':
             range = '12M';
-            step = '2592000'; // 1 month intervals
-            maxDataPoints = 12;
+            step = '86400'; // 1 day intervals for monthly view
             break;
         }
 
@@ -64,7 +74,7 @@ export function usePrometheusData(timeframe: 'minutes' | 'hourly' | 'weekly' | '
           throw new Error('Invalid response from Prometheus');
         }
 
-        const processedData = processPrometheusData(response.data, maxDataPoints);
+        const processedData = processPrometheusData(response.data, timeframe);
         setServices(processedData);
         setError(null);
       } catch (err) {
@@ -93,11 +103,44 @@ export function usePrometheusData(timeframe: 'minutes' | 'hourly' | 'weekly' | '
   return { services, loading, error };
 }
 
-function processPrometheusData(data: any, maxDataPoints: number): ServiceData[] {
-  if (!data?.data?.result) return [];
-
+function processPrometheusData(data: any, timeframe: 'minutes' | 'hourly' | 'weekly' | 'daily' | 'monthly'): ServiceData[] {
+  const now = new Date();
   const serviceMap = new Map<string, ServiceData>();
 
+  // Generate time intervals based on timeframe
+  let intervals: Date[];
+  switch (timeframe) {
+    case 'minutes':
+      const hourAgo = subHours(now, 1);
+      intervals = Array.from({ length: 60 }, (_, i) => new Date(hourAgo.getTime() + i * 60000));
+      break;
+    case 'hourly':
+      intervals = eachHourOfInterval({
+        start: subHours(startOfHour(now), 23),
+        end: now
+      });
+      break;
+    case 'weekly':
+      intervals = eachDayOfInterval({
+        start: subDays(startOfDay(now), 6),
+        end: now
+      });
+      break;
+    case 'daily':
+      intervals = eachDayOfInterval({
+        start: subDays(startOfDay(now), 29),
+        end: now
+      });
+      break;
+    case 'monthly':
+      intervals = eachMonthOfInterval({
+        start: subMonths(startOfMonth(now), 11),
+        end: now
+      });
+      break;
+  }
+
+  // Initialize services with all intervals
   data.data.result.forEach((metric: any) => {
     const name = metric.metric.service_name;
     const group = metric.metric.group;
@@ -106,38 +149,46 @@ function processPrometheusData(data: any, maxDataPoints: number): ServiceData[] 
       serviceMap.set(name, {
         name,
         group,
-        dataPoints: [],
+        uptime: intervals.map(timestamp => ({
+          timestamp,
+          status: -1, // Default to "no data"
+          uptimePercentage: 0
+        })),
         uptimePercentage: 0
       });
     }
 
     const service = serviceMap.get(name)!;
     
-    // Add data points and ensure we don't exceed maxDataPoints
-    metric.values.forEach((value: [number, string]) => {
-      const [timestamp, status] = value;
-      service.dataPoints.push({
-        timestamp,
-        value: status
+    // Process metric values
+    metric.values.forEach(([timestamp, value]: [number, string]) => {
+      const pointDate = new Date(timestamp * 1000);
+      const intervalIndex = intervals.findIndex(interval => {
+        switch (timeframe) {
+          case 'minutes':
+            return Math.abs(interval.getTime() - pointDate.getTime()) < 30000; // Within 30 seconds
+          case 'hourly':
+            return startOfHour(interval).getTime() === startOfHour(pointDate).getTime();
+          case 'weekly':
+          case 'daily':
+            return startOfDay(interval).getTime() === startOfDay(pointDate).getTime();
+          case 'monthly':
+            return startOfMonth(interval).getTime() === startOfMonth(pointDate).getTime();
+        }
       });
+
+      if (intervalIndex !== -1) {
+        service.uptime[intervalIndex].status = parseInt(value);
+        service.uptime[intervalIndex].uptimePercentage = value === "1" ? 100 : 0;
+      }
     });
+
+    // Calculate overall uptime percentage from intervals with data
+    const intervalsWithData = service.uptime.filter(point => point.status !== -1);
+    service.uptimePercentage = intervalsWithData.length > 0
+      ? intervalsWithData.reduce((sum, point) => sum + point.uptimePercentage, 0) / intervalsWithData.length
+      : 0;
   });
 
-  // Process each service
-  return Array.from(serviceMap.values()).map(service => {
-    // Sort data points by timestamp
-    service.dataPoints.sort((a, b) => a.timestamp - b.timestamp);
-    
-    // Limit to maxDataPoints most recent points
-    if (service.dataPoints.length > maxDataPoints) {
-      service.dataPoints = service.dataPoints.slice(-maxDataPoints);
-    }
-    
-    // Calculate uptime percentage
-    const totalPoints = service.dataPoints.length;
-    const upPoints = service.dataPoints.filter(point => point.value === "1").length;
-    service.uptimePercentage = totalPoints > 0 ? (upPoints / totalPoints) * 100 : 0;
-
-    return service;
-  });
+  return Array.from(serviceMap.values());
 }

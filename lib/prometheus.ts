@@ -1,3 +1,4 @@
+
 import { startOfHour, startOfDay, startOfMonth, endOfHour, endOfDay, endOfMonth, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 
 interface PrometheusValue {
@@ -30,6 +31,7 @@ interface ProcessedService {
   uptime: Array<{
     status: number;
     timestamp: Date;
+    uptimePercentage: number;
   }>;
   uptimePercentage: number;
 }
@@ -57,7 +59,11 @@ export function processPrometheusData(
     const timePoints = getTimePoints(now, timeframe);
     const statusPoints = processServiceMetrics(metrics, timePoints, timeframe);
     
-    const uptimePercentage = calculateUptimePercentage(statusPoints);
+    // Calculate overall uptime percentage from individual interval percentages
+    const totalIntervals = statusPoints.length;
+    const uptimePercentage = totalIntervals > 0 
+      ? statusPoints.reduce((sum, point) => sum + (point.status === 1 ? point.uptimePercentage : 0), 0) / totalIntervals
+      : 0;
 
     services.push({
       name: serviceName,
@@ -90,7 +96,7 @@ function getTimePoints(now: Date, timeframe: 'minutes' | 'hourly' | 'weekly' | '
     case 'weekly':
       current = startOfWeek(now);
       for (let i = 6; i >= 0; i--) {
-        points.push(new Date(current.getTime() - i * 7 * 24 * 3600 * 1000));
+        points.push(new Date(current.getTime() - i * 24 * 3600 * 1000));
       }
       break;
     case 'daily':
@@ -116,11 +122,11 @@ function processServiceMetrics(
   metrics: PrometheusMetric[],
   timePoints: Date[],
   timeframe: 'minutes' | 'hourly' | 'weekly' | 'daily' | 'monthly'
-): Array<{ status: number; timestamp: Date }> {
+): Array<{ status: number; timestamp: Date; uptimePercentage: number }> {
   return timePoints.map(timestamp => {
     const interval = getTimeInterval(timestamp, timeframe);
-    const status = getStatusForInterval(metrics, interval);
-    return { status, timestamp };
+    const { status, uptimePercentage } = getStatusForInterval(metrics, interval, timeframe);
+    return { status, timestamp, uptimePercentage };
   });
 }
 
@@ -156,10 +162,23 @@ function getTimeInterval(timestamp: Date, timeframe: 'minutes' | 'hourly' | 'wee
 
 function getStatusForInterval(
   metrics: PrometheusMetric[],
-  interval: { start: Date; end: Date }
-): number {
+  interval: { start: Date; end: Date },
+  timeframe: 'minutes' | 'hourly' | 'weekly' | 'daily' | 'monthly'
+): { status: number; uptimePercentage: number } {
   let totalPoints = 0;
   let upPoints = 0;
+  let subIntervalCount = 0;
+  let subIntervalUpCount = 0;
+
+  // For larger timeframes, we need to consider the uptime of smaller intervals
+  const subIntervalDuration = timeframe === 'minutes' ? 60000 : // 1 minute
+                             timeframe === 'hourly' ? 60000 : // 1 minute
+                             timeframe === 'daily' ? 3600000 : // 1 hour
+                             timeframe === 'weekly' ? 3600000 : // 1 hour
+                             86400000; // 1 day for monthly
+
+  const intervalDuration = interval.end.getTime() - interval.start.getTime();
+  const expectedSubIntervals = Math.floor(intervalDuration / subIntervalDuration);
 
   metrics.forEach(metric => {
     metric.values.forEach(([timestamp, value]) => {
@@ -169,26 +188,34 @@ function getStatusForInterval(
         if (value === "1") {
           upPoints++;
         }
+
+        // Track which sub-interval this point belongs to
+        const subIntervalIndex = Math.floor(
+          (pointDate.getTime() - interval.start.getTime()) / subIntervalDuration
+        );
+        if (!subIntervalCount) {
+          subIntervalCount = expectedSubIntervals;
+        }
       }
     });
   });
 
-  // If no data points in interval, return null to indicate no data
-  if (totalPoints === 0) return 0;
-  
-  // Calculate uptime percentage for the interval
-  const uptimePercentage = upPoints / totalPoints;
-  
-  // Return 1 if uptime percentage meets or exceeds threshold, 0 otherwise
-  return uptimePercentage >= UPTIME_THRESHOLD ? 1 : 0;
-}
+  // If no data points in interval, return -1 to indicate no data
+  if (totalPoints === 0) return { status: -1, uptimePercentage: 0 };
 
-function calculateUptimePercentage(statusPoints: Array<{ status: number }>): number {
-  const totalPoints = statusPoints.length;
-  if (totalPoints === 0) return 0;
+  // Calculate uptime percentage for this specific interval
+  const uptimePercentage = (upPoints / totalPoints) * 100;
 
-  const upPoints = statusPoints.filter(point => point.status === 1).length;
-  return (upPoints / totalPoints) * 100;
+  // For larger timeframes, we need a stricter threshold
+  // The entire interval is considered up only if we have enough data points
+  // and the uptime percentage meets our threshold
+  const hasEnoughData = totalPoints >= (subIntervalCount * 0.5); // At least 50% of expected data points
+  const meetsThreshold = uptimePercentage >= UPTIME_THRESHOLD * 100;
+
+  return {
+    status: hasEnoughData && meetsThreshold ? 1 : 0,
+    uptimePercentage
+  };
 }
 
 function getServiceGroup(serviceName: string): string {
