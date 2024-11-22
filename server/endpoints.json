@@ -4,7 +4,7 @@
             "group": "Archivers Servers",
             "servers": [
                 {
-                    "url": "http://34.68.218.222:4000/nodelistt",
+                    "url": "http://34.68.218.222:4000/nodelist",
                     "name": "Archiver",
                     "help": "This is the first Archiver server",
                     "expectedResponse":{
@@ -20,7 +20,7 @@
             "group": "Core Services",
             "servers": [
                 {
-                    "url": "https://atomium.shardeum.orrrrg",
+                    "url": "https://atomium.shardeum.org",
                     "name": "JSON-RPC Server",
                     "help": "This is the first JSON-RPC server",
                     "body": {

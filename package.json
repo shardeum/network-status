@@ -9,7 +9,8 @@
     "exporter": "node server/exporter.js",
     "test:server": "node server/test-server.js",
     "test": "node scripts/test.js",
-    "start:all": "node scripts/start-services.js"
+    "start:all": "nodemon scripts/start-services.js",
+    "prometheus": "docker run -d --name prometheus -p 9090:9090 -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -26,6 +27,7 @@
     "next-themes": "^0.2.1",
     "prom-client": "^15.1.0",
     "react": "^18.2.0",
+    "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.12.1",
     "tailwind-merge": "^2.2.1",
@@ -36,6 +38,7 @@
     "@types/react": "^18.2.58",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.17",
+    "nodemon": "^3.1.7",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
