@@ -1,23 +1,20 @@
-
 "use client"
 
-import { Card } from '@/components/ui/card'
+import { Card } from '@/components/ui/card';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { format } from 'date-fns'
-import { usePrometheusData } from '@/hooks/usePrometheusData'
-import { Loader2 } from 'lucide-react'
+} from "@/components/ui/tooltip";
+import { format } from 'date-fns';
+import { usePrometheusData } from '@/hooks/usePrometheusData';
+import { Loader2 } from 'lucide-react';
+import { STATUS_COLORS, STATUS_LABELS, MINUTES_IN_DAY } from '@/lib/constants';
+import { formatUptime, formatDowntime } from '@/lib/uptime';
 
-interface UptimeMonitorProps {
-  timeframe: 'minutes' | 'hourly' | 'weekly' | 'daily' | 'monthly'
-}
-
-export function UptimeMonitor({ timeframe }: UptimeMonitorProps) {
-  const { services, loading, error } = usePrometheusData(timeframe);
+export function UptimeMonitor() {
+  const { services, loading, error } = usePrometheusData();
 
   if (loading) {
     return (
@@ -35,36 +32,6 @@ export function UptimeMonitor({ timeframe }: UptimeMonitorProps) {
     );
   }
 
-  const formatTooltipDate = (date: Date) => {
-    switch (timeframe) {
-      case 'minutes':
-        return format(date, 'h:mm a')
-      case 'hourly':
-        return format(date, 'MMM d, h:00 a')
-      case 'weekly':
-        return format(date, 'MMM d, yyyy')
-      case 'daily':
-        return format(date, 'MMM d, yyyy')
-      case 'monthly':
-        return format(date, 'MMMM yyyy')
-    }
-  };
-
-  const getTimeframeLabel = () => {
-    switch (timeframe) {
-      case 'minutes':
-        return 'Last Hour'
-      case 'hourly':
-        return 'Last 24 Hours'
-      case 'weekly':
-        return 'Last 7 Days'
-      case 'daily':
-        return 'Last 30 Days'
-      case 'monthly':
-        return 'Last 12 Months'
-    }
-  };
-
   // Group services by their group
   const groupedServices = services.reduce((acc, service) => {
     if (!acc[service.group]) {
@@ -77,24 +44,6 @@ export function UptimeMonitor({ timeframe }: UptimeMonitorProps) {
   return (
     <TooltipProvider>
       <div className="space-y-8">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-medium text-gray-600">{getTimeframeLabel()}</h2>
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded"></div>
-              <span>Online</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded"></div>
-              <span>Offline</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-gray-300 rounded"></div>
-              <span>No Data</span>
-            </div>
-          </div>
-        </div>
-
         {Object.entries(groupedServices).map(([group, groupServices]) => (
           <div key={group} className="space-y-4">
             <h2 className="text-2xl font-semibold text-gray-800">{group}</h2>
@@ -111,25 +60,19 @@ export function UptimeMonitor({ timeframe }: UptimeMonitorProps) {
                         <TooltipTrigger asChild>
                           <div
                             className={`h-full w-full rounded cursor-pointer transition-colors ${
-                              point.status === -1
-                                ? 'bg-gray-300'
-                                : point.status === 1
-                                ? 'bg-green-500'
-                                : 'bg-red-500'
+                              STATUS_COLORS[point.status as keyof typeof STATUS_COLORS]
                             }`}
                           />
                         </TooltipTrigger>
                         <TooltipContent>
                           <p className="text-sm">
-                            {formatTooltipDate(point.timestamp)}
+                            {format(point.timestamp, 'MMM d, yyyy')}
                             <br />
-                            Status: {point.status === -1 
-                              ? 'No Data' 
-                              : point.status === 1 
-                              ? 'Online' 
-                              : 'Offline'}
+                            Status: {STATUS_LABELS[point.status as keyof typeof STATUS_LABELS]}
                             <br />
-                            Uptime: {point.uptimePercentage.toFixed(2)}%
+                            Uptime: {formatUptime(MINUTES_IN_DAY - point.downtimeMinutes)}
+                            <br />
+                            Downtime: {formatDowntime(point.downtimeMinutes)}
                           </p>
                         </TooltipContent>
                       </Tooltip>
@@ -139,14 +82,14 @@ export function UptimeMonitor({ timeframe }: UptimeMonitorProps) {
                   <div className="mt-4 flex justify-between text-sm text-gray-600">
                     <span>
                       {service.uptime.length > 0 && 
-                        formatTooltipDate(service.uptime[0].timestamp)}
+                        format(service.uptime[0].timestamp, 'MMM d, yyyy')}
                     </span>
                     <span className="font-medium">
                       {service.uptimePercentage.toFixed(2)}% uptime
                     </span>
                     <span>
                       {service.uptime.length > 0 && 
-                        formatTooltipDate(service.uptime[service.uptime.length - 1].timestamp)}
+                        format(service.uptime[service.uptime.length - 1].timestamp, 'MMM d, yyyy')}
                     </span>
                   </div>
                 </Card>
