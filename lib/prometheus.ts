@@ -1,41 +1,6 @@
 
 import { startOfHour, startOfDay, startOfMonth, endOfHour, endOfDay, endOfMonth, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
-
-interface PrometheusValue {
-  timestamp: number;
-  value: string;
-}
-
-interface PrometheusMetric {
-  metric: {
-    name: string;
-    job: string;
-    instance: string;
-    duration: string;
-    timestamp: string;
-  };
-  values: [number, string][];
-}
-
-interface PrometheusResponse {
-  status: string;
-  data: {
-    resultType: string;
-    result: PrometheusMetric[];
-  };
-}
-
-interface ProcessedService {
-  name: string;
-  group: string;
-  uptime: Array<{
-    status: number;
-    timestamp: Date;
-    uptimePercentage: number;
-  }>;
-  uptimePercentage: number;
-}
-
+import type { PrometheusMetric, PrometheusResponse, ProcessedService } from '@/types/service';
 const UPTIME_THRESHOLD = 0.9; // 90% threshold for considering a period as "up"
 
 export function processPrometheusData(

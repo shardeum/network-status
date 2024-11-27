@@ -10,27 +10,37 @@ export function calculateStatus(downtimeMinutes: number): number {
 export function calculateDowntimeMinutes(values: [number, string][]): number {
   if (!values || values.length === 0) return MINUTES_IN_DAY;
 
-  let downtimeMinutes = 0;
-  let lastTimestamp = 0;
-  
-  // Sort values by timestamp to ensure chronological order
+  let totalDowntimeMinutes = 0;
   const sortedValues = [...values].sort((a, b) => a[0] - b[0]);
   
-  sortedValues.forEach(([timestamp, value], index) => {
-    const uptimeValue = parseInt(value);
-    
-    // Calculate interval duration
-    const intervalMinutes = index === 0 ? 1 : (timestamp - lastTimestamp) / 60;
-    
-    // Add downtime if service was down during this interval
-    if (uptimeValue === 0) {
-      downtimeMinutes += intervalMinutes;
-    }
-    
-    lastTimestamp = timestamp;
-  });
+  let lastTimestamp: number | null = null;
+  let lastValue: number | null = null;
 
-  return Math.min(Math.round(downtimeMinutes), MINUTES_IN_DAY);
+  for (let i = 0; i < sortedValues.length; i++) {
+    const [timestamp, value] = sortedValues[i];
+    const currentValue = parseFloat(value);
+    
+    if (lastTimestamp !== null && lastValue !== null) {
+      const timeDiff = (timestamp - lastTimestamp) / 60; // Convert to minutes
+      
+      // If service was down in the previous reading
+      if (lastValue < 1) {
+        totalDowntimeMinutes += timeDiff;
+      }
+    }
+
+    lastTimestamp = timestamp;
+    lastValue = currentValue;
+  }
+
+  // If the last reading shows service is down, add time until now
+  if (lastValue !== null && lastValue < 1 && lastTimestamp !== null) {
+    const now = Date.now() / 1000;
+    const finalTimeDiff = (now - lastTimestamp) / 60;
+    totalDowntimeMinutes += finalTimeDiff;
+  }
+
+  return Math.min(Math.round(totalDowntimeMinutes), MINUTES_IN_DAY);
 }
 
 export function formatUptime(uptimeMinutes: number): string {
