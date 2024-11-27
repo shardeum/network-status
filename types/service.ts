@@ -23,8 +23,6 @@ export interface ServiceData {
     [key: string]: ServiceData[];
   }
 
-  export type TimeFrame = 'minute' | 'hour' | 'day' | 'week' | 'month';
-
   export interface TimeframePeriod {
     timestamp: Date;
     status: number;
