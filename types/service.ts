@@ -1,7 +1,12 @@
 export interface ServiceData {
     name: string;
     group: string;
-    uptime: Array<TimeframeStatus>;
+    uptime: Array<{
+      status: number;
+      timestamp: Date;
+      uptimePercentage: number;
+      downtimeMinutes: number;
+    }>;
     uptimePercentage: number;
   }
   

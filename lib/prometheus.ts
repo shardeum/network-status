@@ -1,19 +1,8 @@
-
-
+import { ServiceData } from '@/types/service';
 import { STATUS, MINUTES_IN_DAY } from '@/lib/constants';
-import { startOfDay, subDays } from 'date-fns';
+import { startOfDay, endOfDay, subDays } from 'date-fns';
 import { calculateStatus, calculateDowntimeMinutes, calculateUptimePercentage } from './uptime';
-interface ServiceData {
-  name: string;
-  group: string;
-  uptime: Array<{
-    status: number;
-    timestamp: Date;
-    uptimePercentage: number;
-    downtimeMinutes: number;
-  }>;
-  uptimePercentage: number;
-}
+
 export function processPrometheusData(data: any): ServiceData[] {
   if (!data?.result) return [];
 
@@ -51,29 +40,22 @@ export function processPrometheusData(data: any): ServiceData[] {
     const service = serviceMap.get(name);
     if (!service) return;
 
-    // Group values by day
-    const dailyValues = new Map<number, [number, string][]>();
-    
-    metric.values.forEach((value: [number, string]) => {
-      const date = startOfDay(new Date(value[0] * 1000));
-      const dayTimestamp = date.getTime();
-      
-      if (!dailyValues.has(dayTimestamp)) {
-        dailyValues.set(dayTimestamp, []);
-      }
-      dailyValues.get(dayTimestamp)!.push(value);
-    });
-
-    // Process each day's data
+    // Process each day's data independently
     service.uptime = service.uptime.map(day => {
       const dayStart = startOfDay(day.timestamp);
-      const values = dailyValues.get(dayStart.getTime());
+      const dayEnd = endOfDay(day.timestamp);
       
-      if (!values || values.length === 0) {
+      // Filter values for this specific day
+      const dayValues = metric.values.filter((value: [number, string]) => {
+        const timestamp = value[0] * 1000;
+        return timestamp >= dayStart.getTime() && timestamp <= dayEnd.getTime();
+      });
+
+      if (dayValues.length === 0) {
         return day;
       }
 
-      const downtimeMinutes = calculateDowntimeMinutes(values);
+      const downtimeMinutes = calculateDowntimeMinutes(dayValues);
       return {
         timestamp: dayStart,
         status: calculateStatus(downtimeMinutes),
