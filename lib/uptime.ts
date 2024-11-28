@@ -1,4 +1,11 @@
+
 import { THRESHOLDS, STATUS, MINUTES_IN_DAY } from '@/lib/constants';
+import { endOfDay } from 'date-fns';
+interface DowntimePeriod {
+  start: number;
+  end: number;
+  duration: number;
+}
 
 export function calculateStatus(downtimeMinutes: number): number {
   if (downtimeMinutes === MINUTES_IN_DAY) return STATUS.NO_DATA;
@@ -33,10 +40,13 @@ export function calculateDowntimeMinutes(values: [number, string][]): number {
     lastValue = currentValue;
   }
 
-  // If the last reading shows service is down, add time until now
+  // If the last reading shows service is down, add time until end of day
   if (lastValue !== null && lastValue < 1 && lastTimestamp !== null) {
-    const now = Date.now() / 1000;
-    const finalTimeDiff = (now - lastTimestamp) / 60;
+    const dayEnd = Math.floor(endOfDay(new Date(lastTimestamp * 1000)).getTime() / 1000);
+    const finalTimeDiff = Math.min(
+      (dayEnd - lastTimestamp) / 60,
+      MINUTES_IN_DAY - totalDowntimeMinutes
+    );
     totalDowntimeMinutes += finalTimeDiff;
   }
 

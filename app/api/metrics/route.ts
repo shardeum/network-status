@@ -1,30 +1,24 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import { subDays } from 'date-fns';
+import { subDays, startOfDay, endOfDay } from 'date-fns';
 
 const PROMETHEUS_URL = process.env.PROMETHEUS_URL || 'http://localhost:9090';
-
-// Use 5-minute intervals for better granularity
-const STEP_SIZE = 300; // 5 minutes in seconds
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
-    const end = Math.floor(Date.now() / 1000);
-    const start = Math.floor(subDays(new Date(), 29).getTime() / 1000);
+    const now = new Date();
+    const end = Math.floor(now.getTime() / 1000);
+    const start = Math.floor(subDays(now, 29).getTime() / 1000);
 
-    // Query with 5-minute average
-    const query = `
-      avg_over_time(service_up[5m])
-    `;
-
+    // Single query with 5-minute resolution for better accuracy
     const response = await axios.get(`${PROMETHEUS_URL}/api/v1/query_range`, {
       params: {
-        query,
+        query: 'service_up',
         start,
         end,
-        step: STEP_SIZE,
+        step: 300, // 5-minute intervals
       },
       timeout: 5000,
     });
