@@ -94,46 +94,43 @@ function processPrometheusData(data: any, existingTimeWindows: Map<string, TimeW
       });
     }
 
-    // Process time windows
-    const serviceWindows = newTimeWindows.get(name) || [];
-    const currentDay = startOfDay(now);
+    let serviceWindows = newTimeWindows.get(name) || [];
     
-    // Get or create current day's window
-    let currentWindow = serviceWindows.find(w => 
-      w.start.getTime() === currentDay.getTime()
-    );
-
-    if (!currentWindow) {
-      currentWindow = {
-        start: currentDay,
-        end: endOfDay(currentDay),
-        values: [],
-        accumulatedDowntime: 0
-      };
-      serviceWindows.push(currentWindow);
-    }
-
-    // Add new values and calculate accumulated downtime
-    const newValues = metric.values.filter((value: [number, string]) => {
+    metric.values.forEach((value: [number, string]) => {
       const timestamp = new Date(value[0] * 1000);
-      return isWithinInterval(timestamp, { start: currentWindow!.start, end: currentWindow!.end });
+      const dayStart = startOfDay(timestamp);
+      
+      let window = serviceWindows.find(w => 
+        w.start.getTime() === dayStart.getTime()
+      );
+
+      if (!window) {
+        window = {
+          start: dayStart,
+          end: endOfDay(dayStart),
+          values: [],
+          accumulatedDowntime: 0
+        };
+        serviceWindows.push(window);
+      }
+
+      if (isWithinInterval(timestamp, { start: window.start, end: window.end })) {
+        const isDown = parseFloat(value[1]) < 1;
+        window.values.push([value[0], isDown ? "0" : "1"]);
+      }
     });
 
-    if (newValues.length > 0) {
-      currentWindow.values = [...currentWindow.values, ...newValues]
-        .sort((a, b) => a[0] - b[0]);
+    serviceWindows = serviceWindows
+      .sort((a, b) => a.start.getTime() - b.start.getTime())
+      .slice(-30);
 
-      // Calculate downtime for this window
-      const downtimeMinutes = calculateDowntimeMinutes(currentWindow.values);
-      currentWindow.accumulatedDowntime = Math.max(
-        currentWindow.accumulatedDowntime,
-        downtimeMinutes
-      );
-    }
+    serviceWindows.forEach(window => {
+      window.values.sort((a, b) => a[0] - b[0]);
+      window.accumulatedDowntime = calculateDowntimeMinutes(window.values);
+    });
 
     newTimeWindows.set(name, serviceWindows);
 
-    // Update service data
     const service = serviceMap.get(name)!;
     serviceWindows.forEach(window => {
       const dayIndex = service.uptime.findIndex(day => 
@@ -151,7 +148,6 @@ function processPrometheusData(data: any, existingTimeWindows: Map<string, TimeW
       }
     });
 
-    // Calculate overall uptime percentage
     const daysWithData = service.uptime.filter(day => day.status !== STATUS.NO_DATA);
     service.uptimePercentage = daysWithData.length > 0
       ? daysWithData.reduce((sum, day) => sum + day.uptimePercentage, 0) / daysWithData.length
