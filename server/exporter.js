@@ -180,8 +180,21 @@ async function checkServiceStatus(service, group) {
         }
       };
 
+      console.log(`[SERVICE] ${service.name} - Making request to ${service.url}`, {
+        method: config.method || 'GET',
+        headers: config.headers,
+        body: config.data || 'none'
+      });
+
       const response = await axiosInstance(service.url, config);
       const responseTime = Date.now() - startTime;
+      
+      console.log(`[SERVICE] ${service.name} - Response received`, {
+        status: response.status,
+        time: `${responseTime}ms`,
+        contentType: response.headers['content-type'],
+        dataLength: typeof response.data === 'string' ? response.data.length : JSON.stringify(response.data).length
+      });
       
       // Record response time regardless of status
       serviceResponseTime.set(
@@ -194,10 +207,24 @@ async function checkServiceStatus(service, group) {
         if (service.expectedResponse) {
           if (typeof service.expectedResponse === 'string') {
             isUp = response.data.includes(service.expectedResponse);
+            if (!isUp) {
+              console.log(`[SERVICE] ${service.name} - Expected string not found`, {
+                expected: service.expectedResponse,
+                received: typeof response.data === 'string' ? 
+                  response.data.substring(0, 100) + '...' : 
+                  'Non-string response'
+              });
+            }
           } else {
             isUp = Object.keys(service.expectedResponse).every(key => 
               response.data.hasOwnProperty(key)
             );
+            if (!isUp) {
+              console.log(`[SERVICE] ${service.name} - Missing expected keys`, {
+                expected: Object.keys(service.expectedResponse),
+                received: Object.keys(response.data)
+              });
+            }
           }
         } else {
           isUp = true;
@@ -234,7 +261,13 @@ async function checkServiceStatus(service, group) {
       
     } catch (error) {
       lastError = error;
-      console.log(`[SERVICE] Attempt ${attempt + 1}/${MAX_RETRIES} failed for ${service.name}: ${error.message}`);
+      console.log(`[SERVICE] ${service.name} - Request failed`, {
+        attempt: `${attempt + 1}/${MAX_RETRIES}`,
+        error: error.message,
+        code: error.code,
+        response: error.response?.data || 'No response data',
+        status: error.response?.status || 'No status code'
+      });
       
       if (attempt < MAX_RETRIES - 1) {
         const delay = RETRY_DELAY * (attempt + 1);
