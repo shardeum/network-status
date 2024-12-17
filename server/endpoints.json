@@ -1,7 +1,7 @@
 {
     "urls": [
         {
-            "group": "Archivers Servers",
+            "group": "Archiver Servers",
             "servers": [
                 {
                     "url": "http://35.193.191.159:4000/nodelist",
@@ -64,12 +64,12 @@
                     "url": "https://docs.shardeum.org/",
                     "name": "Documentation",
                     "help": "This is the Shardeum Documentation",
-                    "expectedResponse": "Shardeum is a scalable, secure, and efficient blockchain platform that enables developers to build and deploy decentralized applications. Dive into our documentation to learn more about Shardeum and how to get started with the network"
+                    "expectedResponse": "Shardeum is a scalable, secure, and efficient blockchain platform that enables developers to build and deploy decentralized applications."
                 }
             ]
         },
         {
-            "group": "Monitors Servers",
+            "group": "Monitor Servers",
             "servers": [
                 {
                     "url": "http://34.28.123.3:3000/summary",
