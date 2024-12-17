@@ -1,10 +1,10 @@
 {
     "urls": [
         {
-            "group": "Archivers Servers",
+            "group": "Archiver Servers",
             "servers": [
                 {
-                    "url": "http://34.68.218.222:4000/nodelist",
+                    "url": "http://35.193.191.159:4000/nodelist",
                     "name": "Archiver",
                     "help": "This is the first Archiver server",
                     "expectedResponse":{
@@ -35,6 +35,19 @@
                     }
                 },
                 {
+                    "url": "https://faucet-atomium.shardeum.org/is-healthy",
+                    "name": "Faucet",
+                    "help": "This is the Shardeum Faucet",
+                    "expectedResponse": {
+                        "health": true
+                    }
+                }
+            ]
+        },
+        {
+            "group": "Web Services",
+            "servers": [
+                {
                     "url": "https://explorer-atomium.shardeum.org",
                     "name": "Explorer",
                     "help": "This is the Shardeum Explorer",
@@ -51,22 +64,14 @@
                     "name": "Documentation",
                     "help": "This is the Shardeum Documentation",
                     "expectedResponse": "Shardeum is a scalable, secure, and efficient blockchain platform that enables developers to build and deploy decentralized applications. Dive into our documentation to learn more about Shardeum and how to get started with the network"
-                },
-                {
-                    "url": "https://faucet-atomium.shardeum.org/is-healthy",
-                    "name": "Faucet",
-                    "help": "This is the Shardeum Faucet",
-                    "expectedResponse": {
-                        "health": true
-                    }
                 }
             ]
         },
         {
-            "group": "Monitors Servers",
+            "group": "Monitor Servers",
             "servers": [
                 {
-                    "url": "http://54.185.250.216:3000/summary",
+                    "url": "http://34.28.123.3:3000/summary",
                     "name": "Monitor",
                     "help": "This is the first Monitor server",
                     "expectedResponse": "Ascending"

@@ -69,8 +69,8 @@ export function UptimeMonitor() {
                             {format(point.timestamp, 'MMM d, yyyy')}
                             <br />
                             Status: {STATUS_LABELS[point.status as keyof typeof STATUS_LABELS]}
-                            <br />
-                            Uptime: {formatUptime(MINUTES_IN_DAY - point.downtimeMinutes)}
+                            {/* <br /> */}
+                            {/* Uptime: {formatUptime(MINUTES_IN_DAY - point.downtimeMinutes)} */}
                             <br />
                             Downtime: {formatDowntime(point.downtimeMinutes)}
                           </p>
