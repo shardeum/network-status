@@ -5,7 +5,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data_itn4_0:/prometheus
+      - prometheus_data_itn04:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -47,4 +47,4 @@ networks:
     driver: bridge
 
 volumes:
-  prometheus_data_itn4_0:
+  prometheus_data_itn04:
