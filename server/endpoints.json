@@ -1,7 +1,7 @@
 {
     "urls": [
         {
-            "group": "Archiver Servers",
+            "group": "Archivers Servers",
             "servers": [
                 {
                     "url": "http://35.193.191.159:4000/nodelist",
@@ -69,7 +69,7 @@
             ]
         },
         {
-            "group": "Monitor Servers",
+            "group": "Monitors Servers",
             "servers": [
                 {
                     "url": "http://34.28.123.3:3000/summary",
