@@ -155,7 +155,16 @@ const RETRY_DELAY = 1000;
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function checkServiceStatus(service, group) {
+  console.log('[DEBUG] Service check values:', {
+    name: service.name,
+    group: group,
+    url: service.url,
+    originalGroup: service.group  
+  });
+
   const serviceKey = `${service.name}-${group}-${service.url}`;
+
+  console.log('[DEBUG] Service key:', serviceKey);
   
   // Initialize service state if it doesn't exist
   if (!serviceStates.has(serviceKey)) {
