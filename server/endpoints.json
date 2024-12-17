@@ -1,22 +1,6 @@
 {
     "urls": [
-        {
-            "group": "Archiver Servers",
-            "servers": [
-                {
-                    "url": "http://35.193.191.159:4000/nodelist",
-                    "name": "Archiver",
-                    "help": "This is the first Archiver server",
-                    "expectedResponse":{
-                         "nodeList": [{}, {}],
-                        "sign":{
-                            "owner":"1c63734aedef5665d6cf02d3a79ae30aedcbd27eae3b76fff05d587a6ac62981",
-                            "sig": "c17b0aca49848cc5b5013caab8f0c16b334bac7bc2c389a818c76fd9e387b936e4eef2a46107698d61cd0b5744c9e54658ae55a82458bbd2e1144ce15b655907a5063ce34c7462a9028aeb57a403d21499bf28fc0ae27bfcc173a29c6e1a824a"
-                        }
-                    }
-                }
-            ]
-        },
+      
         {
             "group": "Core Services",
             "servers": [
@@ -65,17 +49,6 @@
                     "name": "Documentation",
                     "help": "This is the Shardeum Documentation",
                     "expectedResponse": "Shardeum is a scalable, secure, and efficient blockchain platform that enables developers to build and deploy decentralized applications."
-                }
-            ]
-        },
-        {
-            "group": "Monitor Servers",
-            "servers": [
-                {
-                    "url": "http://34.28.123.3:3000/summary",
-                    "name": "Monitor",
-                    "help": "This is the first Monitor server",
-                    "expectedResponse": "Joining Nodes"
                 }
             ]
         }
