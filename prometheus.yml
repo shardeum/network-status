@@ -8,8 +8,3 @@ scrape_configs:
       - targets: ['34.170.114.90:3002'] # the exporter runs on this port
       #- targets: ['localhost:3002'] # for local development
     metrics_path: '/metrics'
-    metric_relabel_configs:
-      - source_labels: [url]
-        target_label: url
-        regex: '.*'
-        action: keep
