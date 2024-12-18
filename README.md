@@ -5,7 +5,6 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
 ## Features
 
 - 🔍 Real-time service monitoring
-- 📊 Multiple time-frame views (minutes, hourly, daily, weekly, monthly)
 - 📈 Latency tracking and visualization
 - 🔄 Automatic retry mechanism for failed requests
 - 🚦 Status indicators with tooltips
@@ -49,12 +48,13 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
 - Service is considered "up" if:
   - Response status is 200-299
   - Response matches expected format/content
-  - More than 90% of checks in the interval are successful
+  - Downtime is less than 9 minutes -- Partial Outage
+  - Downtime is more than 9 minutes -- Full Outage
 
 #### Refresh Intervals
-- Minutes view: 60 second refresh
-- Hourly view: 5 minute refresh
-- Daily/Weekly/Monthly views: 1 hour refresh
+- Latency: every second refresh
+- Uptime: 5 minute refresh
+- Realtime: 1 second refresh
 
 ## Setup
 
@@ -99,9 +99,6 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
           "expectedResponse": {
             "field": "value"
           },
-          "headers": {
-            "Authorization": "Bearer token"
-          },
           "body": {
             "key": "value"
           }
@@ -135,29 +132,6 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
 │   └── endpoints.json    # Service configuration
 └── scripts/              # Helper scripts
 ```
-
-### Testing
-
-1. **Test Environment**
-   ```bash
-   npm run test
-   ```
-   This starts:
-   - Test server (mock services)
-   - Prometheus exporter
-   - Next.js development server
-
-2. **Test Endpoints**
-   - Located in `server/test-endpoints.json`
-   - Provides mock services for testing
-
-## Timeframes and Data Points
-
-- **Minutes**: 60 indicators (1 per minute)
-- **Hourly**: 24 indicators (1 per hour)
-- **Daily**: 30 indicators (1 per day)
-- **Weekly**: 7 indicators (1 per week)
-- **Monthly**: 12 indicators (1 per month)
 
 ## Error Handling
 
