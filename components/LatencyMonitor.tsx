@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { Card } from '@/components/ui/card'
-import { useLatencyData } from '@/hooks/useLatencyData'
-import { Loader2 } from 'lucide-react'
-import { format } from 'date-fns'
+import { Card } from "@/components/ui/card";
+import { useLatencyData } from "@/hooks/useLatencyData";
+import { Loader2 } from "lucide-react";
+import { format } from "date-fns";
 import {
   LineChart,
   Line,
@@ -12,8 +12,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
-} from 'recharts'
+  ResponsiveContainer,
+} from "recharts";
 
 export function LatencyMonitor() {
   const { services, loading, error } = useLatencyData();
@@ -21,7 +21,7 @@ export function LatencyMonitor() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -29,7 +29,7 @@ export function LatencyMonitor() {
   if (error) {
     console.error(error);
     return (
-      <div className="text-center text-red-500 p-4">
+      <div className="text-center text-destructive p-4">
         Failed to load latency data: {error.message}
       </div>
     );
@@ -45,7 +45,7 @@ export function LatencyMonitor() {
   }, {} as Record<string, typeof services>);
 
   const formatDate = (timestamp: number) => {
-    return format(new Date(timestamp * 1000), 'HH:mm');
+    return format(new Date(timestamp * 1000), "HH:mm");
   };
 
   const formatLatency = (value: number) => {
@@ -53,28 +53,33 @@ export function LatencyMonitor() {
   };
 
   const colors = [
-    'hsl(var(--chart-1))',
-    'hsl(var(--chart-2))',
-    'hsl(var(--chart-3))',
-    'hsl(var(--chart-4))',
-    'hsl(var(--chart-5))'
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
   ];
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-medium text-gray-600">Response Time (Last Hour)</h2>
+        <h2 className="text-xl font-medium text-muted-foreground">
+          Response Time (Last Hour)
+        </h2>
       </div>
 
       {Object.entries(groupedServices).map(([group, groupServices]) => (
         <div key={group} className="space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-800">{group}</h2>
+          <h2 className="text-2xl font-semibold text-foreground">{group}</h2>
           <div className="space-y-4">
             {groupServices.map((service, serviceIndex) => (
-              <Card key={service.name} className="p-6">
+              <Card
+                key={service.name}
+                className="p-6 bg-card text-card-foreground"
+              >
                 <div className="mb-4">
                   <h3 className="text-xl font-semibold">{service.name}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Average latency: {service.averageLatency.toFixed(0)}ms
                   </p>
                 </div>
@@ -85,19 +90,32 @@ export function LatencyMonitor() {
                       data={service.dataPoints}
                       margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="hsl(var(--border))"
+                      />
                       <XAxis
                         dataKey="timestamp"
                         tickFormatter={formatDate}
                         interval="preserveStartEnd"
+                        stroke="hsl(var(--foreground))"
                       />
                       <YAxis
                         tickFormatter={formatLatency}
-                        domain={['auto', 'auto']}
+                        domain={["auto", "auto"]}
+                        stroke="hsl(var(--foreground))"
                       />
                       <Tooltip
                         labelFormatter={(label) => formatDate(label as number)}
-                        formatter={(value: number) => [`${value.toFixed(0)}ms`, 'Latency']}
+                        formatter={(value: number) => [
+                          `${value.toFixed(0)}ms`,
+                          "Latency",
+                        ]}
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          color: "hsl(var(--card-foreground))",
+                          borderColor: "hsl(var(--border))",
+                        }}
                       />
                       <Legend />
                       <Line
