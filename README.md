@@ -162,7 +162,71 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
 
 MIT License - feel free to use this project for any purpose.
 
-## Support
 
-For issues and feature requests, please create an issue in the repository.
-# my contribution
+
+# Improvements for Dark/Light Mode Integration:
+
+If you want to implement a working dark/light toggle functionality, here’s an update for your ThemeProvider and Header:
+
+1. Update ThemeProvider: Ensure your ThemeProvider supports toggling themes and persisting preferences. Use libraries like next-themes if needed.
+
+Example:
+
+`// components/ui/providers/theme-provider.tsx
+'use client';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+export function ThemeProvider({ children, attribute }: { children: React.ReactNode; attribute: string }) {
+    return <NextThemesProvider attribute={attribute}>{children}</NextThemesProvider>;
+}`
+
+
+2. Add Toggle Button: Include a toggle button in the Header component to switch themes.
+
+`// components/Header.tsx
+'use client';
+
+import { useTheme } from 'next-themes';
+
+export function Header() {
+    const { theme, setTheme } = useTheme();
+
+    return (
+        <header className="flex justify-between p-4">
+            <h1>Shardeum Network Status Monitor</h1>
+            <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 border rounded"
+            >
+                {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            </button>
+        </header>
+    );
+}`
+
+
+3. Tailwind Configuration: Make sure your tailwind.config.js is set up to support dark mode via the class strategy:
+
+`// tailwind.config.js
+module.exports = {
+    darkMode: 'class', // Enable class-based dark mode
+    content: ['./pages//*.{js,ts,jsx,tsx}', './components//*.{js,ts,jsx,tsx}'],
+    theme: {
+        extend: {},
+    },
+    plugins: [],
+};`
+
+
+4. CSS Setup: Ensure your global styles include base styles for dark and light modes.
+
+`/* globals.css */
+body {
+    @apply bg-white text-black;
+}
+body.dark {
+    @apply bg-black text-white;
+}`
+
+This will enable users to toggle between dark and light modes seamlessly, and their preference will persist.
+
+
