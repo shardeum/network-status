@@ -150,7 +150,7 @@ const axiosInstance = axios.create({
 });
 
 const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
+const RETRY_DELAY = 2000;
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -163,8 +163,6 @@ async function checkServiceStatus(service, group) {
   });
 
   const serviceKey = `${service.name}-${group}-${service.url}`;
-
-  console.log('[DEBUG] Service key:', serviceKey);
   
   // Initialize service state if it doesn't exist
   if (!serviceStates.has(serviceKey)) {

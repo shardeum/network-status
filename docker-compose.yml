@@ -22,6 +22,7 @@ services:
       - "3002:3002"
     environment:
       - NODE_ENV=production
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
     restart: unless-stopped
     networks:
       - monitor-network
