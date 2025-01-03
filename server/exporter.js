@@ -48,13 +48,31 @@ class ServiceState {
     this.isUp = true;
     this.lastStateChange = Date.now();
     this.alertSent = false;
+    this.pendingDownAlert = null;
+    this.isInGracePeriod = false;
   }
 
   setState(isUp) {
+    if (this.isInGracePeriod && isUp) {
+      if (this.pendingDownAlert) {
+        clearTimeout(this.pendingDownAlert);
+        this.pendingDownAlert = null;
+      }
+      this.isInGracePeriod = false;
+      return { stateChanged: false, downtime: null };
+    }
+
     if (this.isUp !== isUp) {
       const previousStateChange = this.lastStateChange;
       this.lastStateChange = Date.now();
       this.isUp = isUp;
+      
+      if (isUp && this.pendingDownAlert) {
+        clearTimeout(this.pendingDownAlert);
+        this.pendingDownAlert = null;
+        this.isInGracePeriod = false;
+      }
+      
       this.alertSent = false;
       return {
         stateChanged: true,
@@ -64,12 +82,38 @@ class ServiceState {
     return { stateChanged: false, downtime: null };
   }
 
-  shouldAlert() {
-    if (!this.alertSent) {
+  shouldAlert(isDownAlert = false) {
+    if (this.isInGracePeriod) {
+      return false;
+    }
+    
+    if (isDownAlert) {
+      return false;
+    }
+    
+    if (!this.alertSent && this.isUp) {
       this.alertSent = true;
       return true;
     }
     return false;
+  }
+
+  scheduleDownAlert(callback) {
+    if (this.pendingDownAlert) {
+      clearTimeout(this.pendingDownAlert);
+    }
+
+    this.isInGracePeriod = true;
+
+    this.pendingDownAlert = setTimeout(async () => {
+      this.isInGracePeriod = false;
+      
+      if (!this.isUp && !this.alertSent) {
+        this.alertSent = true;
+        await callback();
+      }
+      this.pendingDownAlert = null;
+    }, 60000);
   }
 }
 
@@ -214,24 +258,10 @@ async function checkServiceStatus(service, group) {
         if (service.expectedResponse) {
           if (typeof service.expectedResponse === 'string') {
             isUp = response.data.includes(service.expectedResponse);
-            if (!isUp) {
-              console.log(`[SERVICE] ${service.name} - Expected string not found`, {
-                expected: service.expectedResponse,
-                received: typeof response.data === 'string' ? 
-                  response.data.substring(0, 100) + '...' : 
-                  'Non-string response'
-              });
-            }
           } else {
             isUp = Object.keys(service.expectedResponse).every(key => 
               response.data.hasOwnProperty(key)
             );
-            if (!isUp) {
-              console.log(`[SERVICE] ${service.name} - Missing expected keys`, {
-                expected: Object.keys(service.expectedResponse),
-                received: Object.keys(response.data)
-              });
-            }
           }
         } else {
           isUp = true;
@@ -245,19 +275,34 @@ async function checkServiceStatus(service, group) {
 
       const { stateChanged, downtime } = serviceState.setState(isUp);
       
-      // Send alert only if state changed and alert hasn't been sent
-      if (stateChanged && serviceState.shouldAlert()) {
-        console.log(`[SERVICE] State changed for ${service.name}. Current state: ${isUp ? 'UP' : 'DOWN'}`);
-        await sendSlackNotification(
-          { 
-            name: service.name,
-            group,
-            url: service.url
-          },
-          !isUp,
-          isUp ? null : 'Service response validation failed',
-          downtime
-        );
+      if (stateChanged) {
+        if (!isUp) {
+          // Service just went down - schedule alert to send after 1 minute
+          serviceState.scheduleDownAlert(async () => {
+            await sendSlackNotification(
+              { 
+                name: service.name,
+                group,
+                url: service.url
+              },
+              true, // isDown
+              'Service response validation failed',
+              null
+            );
+          });
+        } else if (serviceState.shouldAlert()) {
+          // Service has recovered - send alert immediately
+          await sendSlackNotification(
+            { 
+              name: service.name,
+              group,
+              url: service.url
+            },
+            false, // not down
+            null,
+            downtime
+          );
+        }
       }
       
       if (isUp) {
@@ -351,5 +396,5 @@ app.listen(port, () => {
   
   // Start checking services
   checkAllServices();
-  setInterval(checkAllServices, 60000);
+  setInterval(checkAllServices, 60000); // Every 60 seconds
 });

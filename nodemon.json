@@ -1,6 +1,5 @@
 {
-  "watch": ["scripts/", "server/"],
-  "ext": "js,json,ts",
-  "ignore": ["node_modules/", ".next/"],
-  "exec": "node scripts/start-services.js"
+  "ignore": [".git", "node_modules/**/node_modules", ".next"],
+  "ext": "js,json,tsx,ts",
+  "watch": ["server/", "scripts/"]
 } 
