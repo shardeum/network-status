@@ -52,7 +52,7 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
   - Service remains in failed state for >1 minute
 - Notification Logic:
   - DOWN notifications are sent only after 1-minute grace period
-  - RECOVERY notifications are sent immediately after a confirmed downtime
+  - RECOVERY notifications are sent immediately after a confirmed uptime
   - Transient failures (<1 minute) are ignored to reduce noise
   - Downtime duration is included in recovery notifications
 
