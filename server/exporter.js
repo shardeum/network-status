@@ -47,10 +47,10 @@ class ServiceState {
     this.url = url;
     this.isUp = true;
     this.lastStateChange = Date.now();
-    this.alertSent = false;
     this.pendingDownAlert = null;
     this.isInGracePeriod = false;
     this.lastConfirmedDowntime = null;
+    this.downtimeAlertSent = false;
   }
 
   setState(isUp) {
@@ -73,10 +73,9 @@ class ServiceState {
         this.lastConfirmedDowntime = Date.now();
       }
       
-      this.alertSent = false;
       return {
         stateChanged: true,
-        downtime: isUp && this.lastConfirmedDowntime ? 
+        downtime: (isUp && this.lastConfirmedDowntime && this.downtimeAlertSent) ? 
           Date.now() - this.lastConfirmedDowntime : 
           null
       };
@@ -86,19 +85,15 @@ class ServiceState {
     return { stateChanged: false, downtime: null };
   }
 
-  shouldAlert(isDownAlert = false) {
+  shouldAlert() {
     if (this.isInGracePeriod) {
       return false;
     }
     
-    if (isDownAlert) {
-      return false;
+    if (this.isUp) {
+      return this.downtimeAlertSent;
     }
     
-    if (!this.alertSent && this.isUp) {
-      this.alertSent = true;
-      return true;
-    }
     return false;
   }
 
@@ -112,12 +107,17 @@ class ServiceState {
     this.pendingDownAlert = setTimeout(async () => {
       this.isInGracePeriod = false;
       
-      if (!this.isUp && !this.alertSent) {
-        this.alertSent = true;
+      if (!this.isUp) {
+        this.downtimeAlertSent = true;
         await callback();
       }
       this.pendingDownAlert = null;
     }, 60000);
+  }
+
+  clearDowntimeAlert() {
+    this.downtimeAlertSent = false;
+    this.lastConfirmedDowntime = null;
   }
 }
 
@@ -281,7 +281,7 @@ async function checkServiceStatus(service, group) {
       
       if (stateChanged) {
         if (!isUp) {
-          // Service just went down - schedule alert to send after 1 minute
+          // Service just went down - schedule alert
           serviceState.scheduleDownAlert(async () => {
             await sendSlackNotification(
               { 
@@ -289,23 +289,24 @@ async function checkServiceStatus(service, group) {
                 group,
                 url: service.url
               },
-              true, // isDown
+              true,
               'Service response validation failed',
               null
             );
           });
         } else if (serviceState.shouldAlert()) {
-          // Service has recovered - send alert immediately
+          // Service recovered and we had previously sent a downtime alert
           await sendSlackNotification(
             { 
               name: service.name,
               group,
               url: service.url
             },
-            false, // not down
+            false,
             null,
             downtime
           );
+          serviceState.clearDowntimeAlert(); // Reset downtime tracking after recovery
         }
       }
       
