@@ -50,6 +50,7 @@ class ServiceState {
     this.alertSent = false;
     this.pendingDownAlert = null;
     this.isInGracePeriod = false;
+    this.lastConfirmedDowntime = null;
   }
 
   setState(isUp) {
@@ -59,26 +60,29 @@ class ServiceState {
         this.pendingDownAlert = null;
       }
       this.isInGracePeriod = false;
+      this.isUp = true;
       return { stateChanged: false, downtime: null };
     }
 
-    if (this.isUp !== isUp) {
+    if (this.isUp !== isUp && !this.isInGracePeriod) {
       const previousStateChange = this.lastStateChange;
       this.lastStateChange = Date.now();
       this.isUp = isUp;
       
-      if (isUp && this.pendingDownAlert) {
-        clearTimeout(this.pendingDownAlert);
-        this.pendingDownAlert = null;
-        this.isInGracePeriod = false;
+      if (!isUp) {
+        this.lastConfirmedDowntime = Date.now();
       }
       
       this.alertSent = false;
       return {
         stateChanged: true,
-        downtime: isUp ? this.lastStateChange - previousStateChange : null
+        downtime: isUp && this.lastConfirmedDowntime ? 
+          Date.now() - this.lastConfirmedDowntime : 
+          null
       };
     }
+
+    this.isUp = isUp;
     return { stateChanged: false, downtime: null };
   }
 
