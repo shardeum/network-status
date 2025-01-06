@@ -112,7 +112,7 @@ class ServiceState {
         await callback();
       }
       this.pendingDownAlert = null;
-    }, 60000);
+    }, 300000);
   }
 
   clearDowntimeAlert() {

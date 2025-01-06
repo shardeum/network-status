@@ -45,15 +45,15 @@ A real-time monitoring system built with Next.js, Prometheus, and Express that t
   - Timeout: 10 seconds per request
 
 #### Status Determination & Alerting
-- Service status changes have a 1-minute grace period
+- Service status changes have a 5-minute grace period
 - Service is considered "down" if:
   - Response status is not 200-299, OR
   - Response doesn't match expected format/content, AND
-  - Service remains in failed state for >1 minute
+  - Service remains in failed state for >5 minutes
 - Notification Logic:
-  - DOWN notifications are sent only after 1-minute grace period
-  - RECOVERY notifications are sent immediately after a confirmed uptime
-  - Transient failures (<1 minute) are ignored to reduce noise
+  - DOWN notifications are sent only after 5-minute grace period
+  - RECOVERY notifications are sent immediately after a confirmed downtime
+  - Transient failures (<5 minutes) are ignored to reduce noise
   - Downtime duration is included in recovery notifications
 
 #### State Management
