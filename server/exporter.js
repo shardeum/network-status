@@ -136,7 +136,8 @@ async function sendSlackNotification(serviceInfo, isDown, error = null, downtime
 
   let downtimeText = '';
   if (downtime) {
-    const minutes = Math.floor(downtime / 1000 / 60);
+    const totalDowntime = downtime + 300000; // +5 minutes grace period
+    const minutes = Math.floor(totalDowntime / 1000 / 60);
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     
