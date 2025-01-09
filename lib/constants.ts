@@ -12,7 +12,7 @@ export const THRESHOLDS = {
   } as const;
   
   export const STATUS_COLORS = {
-    [STATUS.NO_DATA]: 'bg-gray-300',
+    [STATUS.NO_DATA]: 'bg-muted', 
     [STATUS.DOWN]: 'bg-red-500',
     [STATUS.UP]: 'bg-green-500',
     [STATUS.PARTIAL]: 'bg-orange-500',
