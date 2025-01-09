@@ -43,6 +43,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --destructive: 0 84.2% 60.2%;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -69,6 +70,7 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --destructive: 0 70% 50%;
   }
 }
 
@@ -80,3 +82,4 @@
     @apply bg-background text-foreground;
   }
 }
+

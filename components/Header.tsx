@@ -1,7 +1,9 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import Link from "next/link"
+"use client";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/ui/mode-toggle";
+
+import Image from "next/image";
+import Link from "next/link";
 
 export function Header() {
   return (
@@ -10,13 +12,13 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link href="/">
             <Image
-              src="/shardeum-logo.png" 
+              src="/shardeum-logo.png"
               alt="Shardeum Logo"
+              className="transition-all dark:invert"
               width={200}
               height={200}
             />
           </Link>
-         
         </div>
 
         <div className="flex items-center gap-4">
@@ -26,9 +28,9 @@ export function Header() {
           <Link href="/latency">
             <Button variant="ghost">Latency</Button>
           </Link>
-          
+          <ModeToggle />
         </div>
       </div>
     </header>
-  )
+  );
 }
