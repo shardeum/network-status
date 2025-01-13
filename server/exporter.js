@@ -132,22 +132,6 @@ async function sendSlackNotification(serviceInfo, isDown, error = null, downtime
   const status = isDown ? 'DOWN' : 'RECOVERED';
   const emoji = isDown ? ':x:' : ':white_check_mark:';
 
-  console.log(`[SLACK] Preparing notification for ${serviceInfo.name} - Status: ${status}`);
-
-  let downtimeText = '';
-  if (downtime) {
-    const minutes = Math.floor(downtime / 1000 / 60);
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    
-    if (hours > 0) {
-      downtimeText = `*Downtime:* ${hours}h ${remainingMinutes}m\n`;
-    } else {
-      downtimeText = `*Downtime:* ${minutes}m\n`;
-    }
-    console.log(`[SLACK] Downtime calculated: ${downtimeText.trim()}`);
-  }
-
   // alert message
   const message = {
     attachments: [{
@@ -157,24 +141,12 @@ async function sendSlackNotification(serviceInfo, isDown, error = null, downtime
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `${emoji} *Service ${status}*\n` +
-                  `*Service:* ${serviceInfo.name}\n` +
-                  `*URL:* ${serviceInfo.url}\n` +
-                  (error ? `*Error:* ${error}\n` : '') +
-                  (downtimeText ? downtimeText : '') +
-                  `*Time:* ${new Date().toLocaleString()}`
+            text: `${emoji} ${serviceInfo.name} ${status}`
           }
         }
       ]
     }]
   };
-
-  console.log(`[SLACK] Sending notification to webhook:`, {
-    service: serviceInfo.name,
-    status,
-    error: error || 'none',
-    downtime: downtimeText.trim() || 'none'
-  });
 
   try {
     const response = await axios.post(SLACK_WEBHOOK_URL, message);
@@ -203,19 +175,10 @@ const RETRY_DELAY = 2000;
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function checkServiceStatus(service, group) {
-  console.log('[DEBUG] Service check values:', {
-    name: service.name,
-    group: group,
-    url: service.url,
-    originalGroup: service.group  
-  });
-
   const serviceKey = `${service.name}-${group}-${service.url}`;
-  
   // Initialize service state if it doesn't exist
   if (!serviceStates.has(serviceKey)) {
     serviceStates.set(serviceKey, new ServiceState(service.name, group, service.url));
-    console.log(`[SERVICE] Initialized state for ${service.name} in group ${group}`);
   }
   
   const serviceState = serviceStates.get(serviceKey);
@@ -235,20 +198,12 @@ async function checkServiceStatus(service, group) {
         }
       };
 
-      console.log(`[SERVICE] ${service.name} - Making request to ${service.url}`, {
-        method: config.method || 'GET',
-        headers: config.headers,
-        body: config.data || 'none'
-      });
-
       const response = await axiosInstance(service.url, config);
       const responseTime = Date.now() - startTime;
       
       console.log(`[SERVICE] ${service.name} - Response received`, {
         status: response.status,
         time: `${responseTime}ms`,
-        contentType: response.headers['content-type'],
-        dataLength: typeof response.data === 'string' ? response.data.length : JSON.stringify(response.data).length
       });
       
       // Record response time regardless of status
