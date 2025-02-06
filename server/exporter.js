@@ -2,13 +2,15 @@ const express = require('express');
 const client = require('prom-client');
 const axios = require('axios');
 require('dotenv').config({ path: require('path').resolve(__dirname, '.env') });
+
 const endpoints = require(process.env.ENDPOINTS_FILE || './endpoints.json');
 
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 
 console.log('[CONFIG] Environment loaded:', {
   hasSlackWebhook: !!SLACK_WEBHOOK_URL,
-  webhookLength: SLACK_WEBHOOK_URL?.length || 0
+  webhookLength: SLACK_WEBHOOK_URL?.length || 0,
+  webhookUrlStart: SLACK_WEBHOOK_URL ? SLACK_WEBHOOK_URL.substring(0, 20) + '...' : 'none'
 });
 
 const app = express();
@@ -40,6 +42,8 @@ register.registerMetric(serviceResponseTime);
 // service state tracking
 const serviceStates = new Map();
 
+const GRACE_PERIOD_MS = parseInt(process.env.GRACE_PERIOD_MS, 10) || 300000; // default 5 minutes
+
 class ServiceState {
   constructor(name, group, url) {
     this.name = name;
@@ -56,6 +60,7 @@ class ServiceState {
   setState(isUp) {
     if (this.isInGracePeriod && isUp) {
       if (this.pendingDownAlert) {
+        console.log(`[ALERT] Cancelling pending down alert for ${this.name} as service recovered during grace period`);
         clearTimeout(this.pendingDownAlert);
         this.pendingDownAlert = null;
       }
@@ -71,6 +76,9 @@ class ServiceState {
       
       if (!isUp) {
         this.lastConfirmedDowntime = Date.now();
+        console.log(`[ALERT] Service ${this.name} state changed to DOWN at ${new Date(this.lastConfirmedDowntime).toISOString()}`);
+      } else {
+        console.log(`[ALERT] Service ${this.name} state changed to UP at ${new Date().toISOString()}`);
       }
       
       return {
@@ -87,35 +95,40 @@ class ServiceState {
 
   shouldAlert() {
     if (this.isInGracePeriod) {
+      console.log(`[ALERT] Skipping alert for ${this.name} - in grace period`);
       return false;
     }
-    
     if (this.isUp) {
+      console.log(`[ALERT] Service ${this.name} is UP, should send recovery alert: ${this.downtimeAlertSent}`);
       return this.downtimeAlertSent;
     }
-    
     return false;
   }
 
   scheduleDownAlert(callback) {
     if (this.pendingDownAlert) {
+      console.log(`[ALERT] Clearing existing pending alert for ${this.name}`);
       clearTimeout(this.pendingDownAlert);
     }
-
     this.isInGracePeriod = true;
+    console.log(`[ALERT] Scheduling down alert for ${this.name} in ${GRACE_PERIOD_MS/60000} minutes`);
 
     this.pendingDownAlert = setTimeout(async () => {
       this.isInGracePeriod = false;
       
       if (!this.isUp) {
+        console.log(`[ALERT] Grace period ended for ${this.name}, service still down - sending alert`);
         this.downtimeAlertSent = true;
         await callback();
+      } else {
+        console.log(`[ALERT] Grace period ended for ${this.name}, but service is up - no alert needed`);
       }
       this.pendingDownAlert = null;
-    }, 300000);
+    }, GRACE_PERIOD_MS);
   }
 
   clearDowntimeAlert() {
+    console.log(`[ALERT] Clearing downtime alert state for ${this.name}`);
     this.downtimeAlertSent = false;
     this.lastConfirmedDowntime = null;
   }
@@ -129,8 +142,16 @@ async function sendSlackNotification(serviceInfo, isDown, error = null, downtime
   }
 
   const color = isDown ? '#FF0000' : '#36A64F';
-  const status = isDown ? 'DOWN' : 'RECOVERED';
+  const status = isDown ? 'down' : 'up';
   const emoji = isDown ? ':x:' : ':white_check_mark:';
+  const timestamp = new Date().toLocaleString();
+
+  console.log(`[SLACK] Preparing notification for ${serviceInfo.name}:`, {
+    status,
+    isDown,
+    error: error || 'none',
+    downtime: downtime ? `${Math.floor(downtime/1000)}s` : 'none'
+  });
 
   // alert message
   const message = {
@@ -141,7 +162,7 @@ async function sendSlackNotification(serviceInfo, isDown, error = null, downtime
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `${emoji} ${serviceInfo.name} ${status}`
+            text: `${emoji} ${serviceInfo.name} ${status}\nTime: ${timestamp}`
           }
         }
       ]
