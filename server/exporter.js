@@ -7,7 +7,6 @@ const endpoints = require(process.env.ENDPOINTS_FILE || './endpoints.json');
 
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 
-// Enhance the existing logging
 console.log('[CONFIG] Environment loaded:', {
   hasSlackWebhook: !!SLACK_WEBHOOK_URL,
   webhookLength: SLACK_WEBHOOK_URL?.length || 0,
@@ -99,12 +98,10 @@ class ServiceState {
       console.log(`[ALERT] Skipping alert for ${this.name} - in grace period`);
       return false;
     }
-    
     if (this.isUp) {
       console.log(`[ALERT] Service ${this.name} is UP, should send recovery alert: ${this.downtimeAlertSent}`);
       return this.downtimeAlertSent;
     }
-    
     return false;
   }
 
@@ -113,9 +110,8 @@ class ServiceState {
       console.log(`[ALERT] Clearing existing pending alert for ${this.name}`);
       clearTimeout(this.pendingDownAlert);
     }
-
     this.isInGracePeriod = true;
-    console.log(`[ALERT] Scheduling down alert for ${this.name} in 5 minutes`);
+    console.log(`[ALERT] Scheduling down alert for ${this.name} in ${GRACE_PERIOD_MS/60000} minutes`);
 
     this.pendingDownAlert = setTimeout(async () => {
       this.isInGracePeriod = false;
