@@ -4,14 +4,14 @@
             "group": "Archiver Servers",
             "servers": [
                 {
-                    "url": "http://35.193.191.159:4000/nodelist",
+                    "url": "http://104.197.117.164:4000/nodelist",
                     "name": "Archiver",
                     "help": "This is the first Archiver server",
                     "expectedResponse":{
                          "nodeList": [{}, {}],
                         "sign":{
-                            "owner":"1c63734aedef5665d6cf02d3a79ae30aedcbd27eae3b76fff05d587a6ac62981",
-                            "sig": "c17b0aca49848cc5b5013caab8f0c16b334bac7bc2c389a818c76fd9e387b936e4eef2a46107698d61cd0b5744c9e54658ae55a82458bbd2e1144ce15b655907a5063ce34c7462a9028aeb57a403d21499bf28fc0ae27bfcc173a29c6e1a824a"
+                            "owner":"d831bb7c09db45d47338af23ab50cac5d29ef8f3a2cd274dd741370aa472d6c1",
+                            "sig": "270fbf891e291653cb4c43f948a0c8a91cd6dcd88ab0e5b3c9feb7b7a505403145a24fe5ce236dde8602f3b73b93ed883810535bd7d68f184e0d5d1559279c0f6cfedf7bae83d8dab2fc0a9515a28f2318dc9a6e46041cbd525d97cb0a521403"
                         }
                     }
                 }
@@ -21,7 +21,7 @@
             "group": "Core Services",
             "servers": [
                 {
-                    "url": "https://atomium.shardeum.org",
+                    "url": "https://api-testnet.shardeum.org",
                     "name": "JSON-RPC Server",
                     "help": "This is the first JSON-RPC server",
                     "body": {
@@ -34,14 +34,6 @@
                         "jsonrpc": "2.0",
                         "id": 73
                     }
-                },
-                {
-                    "url": "https://faucet-atomium.shardeum.org/is-healthy",
-                    "name": "Faucet",
-                    "help": "This is the Shardeum Faucet",
-                    "expectedResponse": {
-                        "health": true
-                    }
                 }
             ]
         },
@@ -49,7 +41,7 @@
             "group": "Web Services",
             "servers": [
                 {
-                    "url": "https://explorer-atomium.shardeum.org",
+                    "url": "https://explorer-testnet.shardeum.org",
                     "name": "Explorer",
                     "help": "This is the Shardeum Explorer",
                     "expectedResponse": "The Shardeum Betanet Explorer"
@@ -72,7 +64,7 @@
             "group": "Monitor Servers",
             "servers": [
                 {
-                    "url": "http://34.28.123.3:3000/summary",
+                    "url": "http://34.56.47.170:5000/summary",
                     "name": "Monitor",
                     "help": "This is the first Monitor server",
                     "expectedResponse": "Joining Nodes"

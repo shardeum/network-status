@@ -1,7 +1,7 @@
 const express = require('express');
 const client = require('prom-client');
 const axios = require('axios');
-require('dotenv').config({ path: require('path').resolve(__dirname, '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const endpoints = require(process.env.ENDPOINTS_FILE || './endpoints.json');
 

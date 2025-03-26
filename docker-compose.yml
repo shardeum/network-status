@@ -5,12 +5,13 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data_itn04:/prometheus
+      - prometheus_data_testnet:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
     networks:
       - monitor-network
 
@@ -48,4 +49,4 @@ networks:
     driver: bridge
 
 volumes:
-  prometheus_data_itn04:
+  prometheus_data_testnet:
