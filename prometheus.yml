@@ -3,8 +3,8 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: 'shardeum-network-status-monitor'
+  - job_name: 'shardeum-testnet-monitor'
     static_configs:
-      - targets: ['34.57.40.159:3002'] # the exporter runs on this port
-      #- targets: ['localhost:3002'] # for local development
+      # - targets: ['34.57.40.159:3002'] # the exporter runs on this port
+      - targets: ['localhost:3002'] # for local development
     metrics_path: '/metrics'
