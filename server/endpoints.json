@@ -64,7 +64,7 @@
             "group": "Monitor Servers",
             "servers": [
                 {
-                    "url": "http://34.56.47.170:5000/summary",
+                    "url": "http://34.56.47.170:3000/summary",
                     "name": "Monitor",
                     "help": "This is the first Monitor server",
                     "expectedResponse": "Joining Nodes"

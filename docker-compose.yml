@@ -1,5 +1,6 @@
 services:
   prometheus:
+    container_name: shardeum-prometheus
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
@@ -16,6 +17,7 @@ services:
       - monitor-network
 
   exporter:
+    container_name: shardeum-exporter
     build:
       context: .
       dockerfile: Dockerfile.exporter
@@ -29,6 +31,7 @@ services:
       - monitor-network
 
   frontend:
+    container_name: shardeum-frontend
     build:
       context: .
       dockerfile: Dockerfile.frontend
